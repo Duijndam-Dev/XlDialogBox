@@ -682,7 +682,21 @@ namespace ExcelDna.XlDialogBox
             /// <summary>
             ///     disable + ItemNum
             /// </summary>
-            XlDisable = 200
+            XlDisable = 200,
+
+            // dummy to test code
+            XlInvisibleTextBox = 999,
+
+            /// <summary>
+            ///     invisible + ItemNum
+            /// </summary>
+            /// <remarks>
+            ///     UNDOCUMENTED 'hack' to make items invisible by giving a dialog item an ItemNumber > 24
+            ///     This is a POSITIVE offset shifting the XlControl number out of range of the available control numbers
+            ///     A negative offset (e.g. by flipping the polarity) would lead to exceptions in Excel and must be avoided
+            ///     The concept is in line with "Trigger" which adds 100 and "Disable" which adds 200
+            /// </remarks>
+            XlInvisible = 50
         }
 
         /// <summary>
@@ -738,8 +752,6 @@ namespace ExcelDna.XlDialogBox
         /// </summary>
         private object _resultObject;
 
-        private string _HelpTopic;
-
         /// <summary>
         ///     Result array from XlDialogBox call
         /// </summary>
@@ -758,6 +770,8 @@ namespace ExcelDna.XlDialogBox
         ///     Row 1, column 1 is usually left blank.
         /// </remarks>
         private readonly ControlItem _formControl;
+
+        public System.Reflection.MethodBase CallingMethod = null;
 
         #endregion Class members
 
@@ -829,15 +843,6 @@ namespace ExcelDna.XlDialogBox
         {
             get { return Convert.ToInt32(_formControl.IO); }
             set { _formControl.IO = value; }
-        }
-
-        /// <summary>
-        ///     This is part of a hack to work with a non-functioning Help button
-        /// </summary>
-        public string HelpTopic
-        {
-            get { return _HelpTopic; }
-            set { _HelpTopic = value; }
         }
 
         #endregion Dialog Get Set routines
@@ -930,45 +935,43 @@ namespace ExcelDna.XlDialogBox
                         if (bHelp)
                         {
                             // get the Path of xll file;
-                            // for the 32bit xll, the chm file sits in the same folder, with a different file extension
                             string xllPath = ExcelDnaUtil.XllPath;
+                            string xllDir  = System.IO.Path.GetDirectoryName(xllPath);
 
-                            // remove end of stringfor the 64bit xll, we need to adjust the path, removing "64" at end of file name 
-                            string str64 = "64.xll";
-                            if (xllPath.EndsWith(str64))
-                            {
-                                xllPath  = xllPath.Substring(0, xllPath.Length - str64.Length);
-                                xllPath += ".xll";
+                            if (CallingMethod != null)
+                            {   // is there an ExcelCommandAttribute attribute decorating the method where ShowDialog has been called from ?
+                                ExcelCommandAttribute attr = (ExcelCommandAttribute)CallingMethod.GetCustomAttributes(typeof(ExcelCommandAttribute), true)[0];
+                                if (attr != null)
+                                {   
+                                    // get the HelpTopic string and split it in two parts ([a] file name and [b] helptopic)
+                                    string[] parts = attr.HelpTopic.Split('!');
+
+                                    // the complete helpfile path consists of the xll directory + first part of HelpTopic attribute string 
+                                    string chmPath = System.IO.Path.Combine(xllDir, parts[0]);
+
+                                    // See : http://www.help-info.de/en/Help_Info_HTMLHelp/hh_command.htm
+                                    // Example of opening a help topic using help ID = 12030
+                                    // ID is a number that you've defined in the [MAP] section of your project (*.hhp) file
+                                    // and mapped to the required topic in the [ALIAS] section.
+                                    // Note: The "-map ID chm" command line became available in HH 1.1b.
+                                    // C:\> HH.EXE -mapid 12030 ms-its:C:/xTemp/XMLconvert.chm
+
+                                    // get some help WITHOUT specifying HelpTopic
+                                    // System.Diagnostics.Process.Start(chmPath);
+
+                                    // get some help WITH specifying HelpTopic 
+                                    // string helpArguments = "-mapid " + HelpTopic + " ms-its:" + "\"" + chmPath + "\"";
+                                    System.Diagnostics.Process hh = new System.Diagnostics.Process();
+                                    string helpArguments = "-mapid " + parts[1] + " ms-its:" + chmPath;
+                                    hh.StartInfo.FileName = "HH.exe";
+                                    hh.StartInfo.Arguments = helpArguments;
+                                    hh.Start();
+                                }
                             }
-
-                            // change file extension to compiled help
-                            string chmPath = System.IO.Path.ChangeExtension(xllPath, "chm");
-
-                            // alternatively try this: 
-                            // fullPath = "C:/Users/MyName/Documents/MyFolder/MySubFolderEtcEtc";
-                            // RunProgram(Executable("hh.exe"), Options(fullPath || "/MyHelpFile.chm::MyPage.htm"));
-
-                            // See : http://www.help-info.de/en/Help_Info_HTMLHelp/hh_command.htm
-                            // Example of opening a help topic using help ID = 12030
-                            // ID is a number that you've defined in the [MAP] section of your project (*.hhp) file
-                            // and mapped to the required topic in the [ALIAS] section.
-                            // Note: The "-map ID chm" command line became available in HH 1.1b.
-                            // C:\> HH.EXE -mapid 12030 ms-its:C:/xTemp/XMLconvert.chm
-
-                            // now get some help
-                            // System.Diagnostics.Process.Start(chmPath);
-
-                            // commented out; did not work. Need to check effect of spaces in chm-file path later
-                            // if they exist; trim any quotes; we'll add them again, but we don't want them more than once
-                            // chmPath = chmPath.Replace("\"", ""); 
-                            // string helpArguments = "-mapid " + HelpTopic + " ms-its:" + "\"" + chmPath + "\"";
-
-                            System.Diagnostics.Process hh = new System.Diagnostics.Process();
-                            string helpArguments = "-mapid " + HelpTopic + " ms-its:" + chmPath;
-                            hh.StartInfo.FileName = "HH.exe";
-                            hh.StartInfo.Arguments = helpArguments;
-                            hh.Start();
-
+                            else
+                            {
+                                // to do: show dialogbox : no ExcelCommandAttribute found with help information
+                            }
                             continue; // continue with do/while loop and skip data validation when calling for help
                         }
 
@@ -981,7 +984,7 @@ namespace ExcelDna.XlDialogBox
                     if (dataValidation != null)
                         loop = dataValidation(this.IO_index, this._resultArray, this.Controls);
                     else
-                        loop = false;
+                        loop = true; // return control to the dialog in case no data validation is done
                 }
                 while (loop == true);
 
@@ -1117,7 +1120,7 @@ namespace ExcelDna.XlDialogBox
                         return (XlControl)ControlParameters[(int)XlColumn.XlNumberColumn];
                 }
 
-                protected set 
+                protected set
                 {
                     if (value < 0)
                         ControlParameters[(int)XlColumn.XlNumberColumn] = null;
@@ -1250,6 +1253,66 @@ namespace ExcelDna.XlDialogBox
                 }
             }
 
+            /// <summary>
+            ///     Is the control enabled ?
+            /// </summary>
+            public bool VISIBLE
+            {
+                get
+                {
+                    if (ItemNumber == XlControl.XlEmpty)
+                        //Dialog form definition
+                        return true;
+                    else
+                    {
+                        // First make a copy of ItemNumber
+                        XlControl tmp = this.ItemNumber;
+
+                        // subtract 200 if this can be done 
+                        if (tmp > XlControl.XlDisable)
+                            tmp -= XlControl.XlDisable;
+
+                        // subtract 100 if this can be done 
+                        if (tmp > XlControl.XlTrigger)
+                            tmp -= XlControl.XlTrigger;
+                        return (tmp <= XlControl.XlHelpButton);
+                    }
+                }
+
+                set
+                {
+                    if (ItemNumber != XlControl.XlEmpty)
+                    //Dialog form definition
+                    {
+                        if (value != VISIBLE) // only take action if we need to make changes
+                        {
+                            if (value) // make visible
+                            {
+                                // subtract 200 if this can be done 
+                                if (ItemNumber > XlControl.XlDisable)
+                                    ItemNumber -= XlControl.XlDisable;
+
+                                // subtract 100 if this can be done 
+                                if (ItemNumber > XlControl.XlTrigger)
+                                    ItemNumber -= XlControl.XlTrigger;
+
+                                // subtract 50 if this can be done 
+                                if (ItemNumber > XlControl.XlInvisible)
+                                    ItemNumber -= (int)XlControl.XlInvisible;
+                            }
+                            else  // disable
+                            {
+                                // This could be tricky if things go out of sync;
+                                // Better first check if ItemNumber < (int)XlControl.XlDisable
+                                if (ItemNumber < XlControl.XlInvisible)
+                                    ItemNumber += (int)XlControl.XlInvisible;
+                            }
+                        }
+                    }
+                }
+            }
+
+
 
             /// <summary>
             ///     Is the control enabled ?
@@ -1283,7 +1346,7 @@ namespace ExcelDna.XlDialogBox
                             {
                                 // This could be tricky if things go out of sync;
                                 // Better first check if ItemNumber < (int)XlControl.XlDisable
-                                if (ItemNumber > XlControl.XlDisable)
+                                if (ItemNumber < XlControl.XlDisable)
                                     ItemNumber += (int)XlControl.XlDisable;
                             }
                         }
@@ -1361,7 +1424,7 @@ namespace ExcelDna.XlDialogBox
             public bool Visible { get; set; }
 
             /// <summary>
-            ///     Active control definition array
+            ///     Get N x 7-parameter DialogDefinition table
             /// </summary>
             public virtual IEnumerable<object[]> GetControlParameters()
             {

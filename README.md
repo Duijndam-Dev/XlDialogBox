@@ -3,54 +3,54 @@
 
 *Note; this code builds further on the ExcelDna-XlDialog class, available [here](https://github.com/zwq00000/ExcelDna-XlDialog) on GitHub.*
 
-The DIALOG.BOX macro is part of the XLM macro's that predate *Visual Basic for Applications* (VBA) and were introduced in Excel 4.0.  Documentation of these macro functions is hard to find, but a comprehensive [function reference document](https://d13ot9o61jdzpp.cloudfront.net/files/Excel%204.0%20Macro%20Functions%20Reference.pdf) can be found on cloudfront.net.
+The DIALOG.BOX macro is part of the XLM macro's that predate *Visual Basic for Applications* (VBA) and were introduced in Excel 4.0.  Documentation of these macro functions is hard to come by, but a comprehensive [function reference document](https://d13ot9o61jdzpp.cloudfront.net/files/Excel%204.0%20Macro%20Functions%20Reference.pdf) can be found on cloudfront.net.
 
-You may wonder, why spend time and effort on working on such ancient technology, but the point is that there are no good RefEdit controls available for Winforms or WPF-forms.  This is discussed in-depth [here](https://www.breezetree.com/blog/excel-refedit-in-c-sharp/).
+You may wonder, why spend time and effort on working on such ancient technology, but the point is that there are no good RefEdit controls available (yet) for Winforms or WPF-forms.  This is discussed in-depth [here](https://www.breezetree.com/blog/excel-refedit-in-c-sharp/).
 
 The XLM functions and commands are still available in Excel-365 and are exposed to developers  through the `2013 Office System Developer Resources` that provide support in writing  Excel 2013 XLL's'. The following function call creates a dialog box: 
 
 ```c
-Excel4(xlfDialogBox, &returValue, 1, &DialogDefinition)
+Excel12(xlfDialogBox, &returnValue, 1, &DialogDefinition)
 ```
 
-To use this  functionality, requires working with LPXLOPER12 structures that are complex to deal with, because of the  various overloads that exist, and the interaction with Excel's internal memory. A dialog box call, running in a verification loop could look like:
+Using this  functionality requires working with LPXLOPER12 structures that are complex to deal with, because of the  various overloads that exist, and the interaction with Excel's internal memory. A dialog box call, running in a verification loop could look like:
 
 ```C#
 xloper ret_val;
 int xl12;
 cpp_xloper DialogDef((WORD) NUM_DIALOG_ROWS, (WORD) NUM_DIALOG_COLUMNS, UsernameDlg);
-// now set up the N x 7 dialog definition array
+// now set up the N x 7 dialog definition array DialogDef
 do
 {
-    xl12 = Excel4(xlfDialogBox, &ret_val, 1, &DialogDef);
-    if (xl4 || (ret_val.xltype == xltypeBool && ret_val.val._bool == 0))
+    xl12 = Excel12(xlfDialogBox, &ret_val, 1, &DialogDef);
+    if (xl12 || (ret_val.xltype == xltypeBool && ret_val.val._bool == 0))
         break;
-    // Process the input from the dialog by reading
-    // the 7th column of the returned array.
+    // Process the input from the dialog by reading the 7th column of the returned array.
     // ... code omitted
+    
     Excel2(xlFree, 0, 1, &ret_val);
     ret_val.xltype = xltypeNil;
 }
 while (1);
-Excel2(xlFree, 0, 1, &ret_val);
+Excel12(xlFree, 0, 1, &ret_val);
 return 1;
 ```
 
 Developing Excel extensions is a daunting task, which is easy to understand, when you start reading through the [online documentation](https://docs.microsoft.com/en-us/office/client-developer/excel/developing-excel-xlls). Here is where `Excel-DNA` comes to the rescue. Thanks to [Excel-DNA,](https://excel-dna.net/) writing Excel extensions  has become much easier, the code base is easier to maintain and context sensitive help (_compiled into an *.chm file_) is now straightforward to implement. A call to set up a modal dialog box now becomes:
 
 ```C#
-var result = XlCall.Excel(XlCall.xlfDialogBox, dialogDef);
+var result = XlCall.Excel(XlCall.xlfDialogBox, DialogDefinition);
 ```
 
 Where :
 
 * `XlCall.xlfDialogBox` is an enumerated value, telling Excel to create a dialog box. 
 
-* `dialogDef` is a N x 7 two-dimensional array that defines the contents of the dialog box。
+* `DialogDefinition` is a N x 7 two-dimensional array that defines the contents of the dialog box。
 
-The following figure closely resembles the dialog example from `GENERIC.C` from the  `2013 Office System Developer Resources` .
+The `2013 Office System Developer Resources` provide a dialog example in the source file `GENERIC.C`.
 
-In `GENERIC.C` the following parameter table is defined:
+In `GENERIC.C` the following Dialog Definition table is defined:
 
 ```c
 static LPWSTR g_rgDialog[g_rgDialogRows][g_rgDialogCols] =
@@ -74,85 +74,118 @@ static LPWSTR g_rgDialog[g_rgDialogRows][g_rgDialogCols] =
 };
 ```
 
+**Table 1.**
 
+Where [LPWSTR](https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-dtyp/50e9ef83-d6fd-4e22-a34a-2c6b4e3c24f3) stands for a long (32-bit) pointer to a string containing wide (16-bit) Unicode characters. In the table above the strings are not null terminated; there length is defined upfront in octal code. E.g. in `L"\013&Reference:"`  we have 13 characters (base 8). This corresponds with  8+3 =  11 characters (base 10) followed by the 11 characters inside the string: `&Reference:`.  For readability it is easier to strip-off all the L"..." annotation.
 
-The same information is used for the sample dialog shown below, be it that a help button has been added. 
+This gives the following table:
+
+```c#
+    { 00, 000, 000, 494, 210, "Generic Sample Dialog", 0},	// 00 = Dialog ID
+    { 01, 330, 174, 088, 000, "OK",                    0},	// 01 = Default Ok Button
+    { 02, 225, 174, 088, 000, "Cancel",                0},	// 02 = Cancel button
+    { 05, 019, 011, 000, 000, "&Name:",                0},	// 05 = Text label
+    { 06, 019, 029, 251, 000, 0000,                    0},	// 06 = Text box
+    { 14, 305, 015, 154, 073, "&College",              0},	// 14 = Group box
+    { 11, 000, 000, 000, 000, 000,                     2},	// 11 = Radio button group
+    { 12, 000, 000, 000, 000, "&Harvard",              0},	// 12 = Radio button
+    { 12, 000, 000, 000, 000, "&Other",                1},	// 12 = Radio button
+    { 05, 019, 050, 000, 000, "&Reference:",           0},	// 05 = text label
+    { 10, 019, 067, 253, 000, 000,                     0},	// 10 = Reference edit box
+    { 14, 209, 093, 250, 063, "&Qualifications",       0},	// 14 = Group box
+    { 13, 000, 000, 000, 000, "&BA / BS",              1},	// 13 = Check box
+    { 13, 000, 000, 000, 000, "&MA / MS",              1},	// 13 = Check box
+    { 13, 000, 000, 000, 000, "&PhD / Other Grad",     0},	// 13 = Check box
+    { 15, 019, 099, 160, 096, "GENERIC_List1",         1},	// 15 = List box
+
+```
+
+**Table 2.**
+
+The above table is used to define the dialog control items that make up the XlDialogBox dialog. Therefore the following figure closely resembles the dialog example from `GENERIC.C` from the  `2013 Office System Developer Resources`, be it that a help button has been added. 
 
 ![image](./images/Dialog1.png) 
 
-Figure 1. Example dialog
-
-
+**Figure 1. Example dialog**
 
 The C# code to create the above dialog box is shown below:
 
 ```c#
-var dialog = new XlDialogBox() 						{ Width = 494, Height = 210, Text = "Generic Sample Dialog" };
 
-// To do: use reflection to get the HelpTopic as defined in the [ExcelCommand(HelpTopic)] attribute.  
-dialog.HelpTopic = "1001";
+[ExcelCommand(
+    Name = "Dialog1",
+    Description = "Starts an example Dialog",
+    HelpTopic = "XlmDialogExample-AddIn.chm!1001",
+    ShortCut = "^R")]
+public static void Dialog1Command()
+{
+    var dialog = new XlDialogBox()                      { W = 494, H = 210, Text = "Generic Sample Dialog" };
 
-var okBtn = new XlDialogBox.OkButton()              { X = 209, Y = 174, Width = 075, Height = 023 };
-var cancelBtn = new XlDialogBox.CancelButton()      { X = 296, Y = 174, Width = 075, Height = 023 };
-var helpBtn = new XlDialogBox.HelpButton2()         { X = 384, Y = 174, Width = 075, Height = 023 };
+    var okBtn = new XlDialogBox.OkButton()              { X = 209, Y = 174, W = 075, H = 023 };
+    var cancelBtn = new XlDialogBox.CancelButton()      { X = 296, Y = 174, W = 075, H = 023 };
+    var helpBtn = new XlDialogBox.HelpButton2()         { X = 384, Y = 174, W = 075, H = 023 };
 
-var nameLabel = new XlDialogBox.Label               { X = 019, Y = 011, Text = "&Name:" };
-var nameEdit = new XlDialogBox.TextEdit             { X = 019, Y = 029, IO_string = "<Name>" };
+    var nameLabel = new XlDialogBox.Label               { X = 019, Y = 011, Text = "&Name:" };
+    var nameEdit = new XlDialogBox.TextEdit             { X = 019, Y = 029, IO_string = "<Name>" };
 
-var refLabel = new XlDialogBox.Label                { X = 019, Y = 050, Text = "&Reference" };
-var refEdit = new XlDialogBox.RefEdit               { X = 019, Y = 067, Width = 253, };
+    var refLabel = new XlDialogBox.Label                { X = 019, Y = 050, Text = "&Reference" };
+    var refEdit = new XlDialogBox.RefEdit               { X = 019, Y = 067, W = 253 };
 
-var listEdit = new XlDialogBox.ListBox()            { X = 019, Y = 099, Width = 160, Height = 96, IO_index = 2, Text = "GENERIC_List1" };
-listEdit.Items.AddRange(new string[]                { "Bake", "Broil", "Sizzle", "Fry", "Saute" });
+    var listEdit = new XlDialogBox.ListBox()            { X = 019, Y = 099, W = 160, H = 96, IO_index = 2, Text = "GEN_List1" };
+    listEdit.Items.AddRange(new string[]                { "Bake", "Broil", "Sizzle", "Fry", "Saute" });
 
-var educateBox = new XlDialogBox.GroupBox           { X = 305, Y = 015, Width = 154, Height = 073, Text = "College" };
-var RadioGroup = new XlDialogBox.RadioButtonGroup   { IO_index = 1 };
-var RadioHarvr = new XlDialogBox.RadioButton        { Text = "&Harvard" };
-var RadioOther = new XlDialogBox.RadioButton        { Text = "&Other" };
+    var CollegeBox = new XlDialogBox.GroupBox           { X = 305, Y = 015, W = 154, H = 073, Text = "College" };
+    var RadioGroup = new XlDialogBox.RadioButtonGroup   { IO_index = 1, Enable = false };
+    var RadioHarvr = new XlDialogBox.RadioButton        { Text = "&Harvard", Enable = false };
+    var RadioOther = new XlDialogBox.RadioButton        { Text = "&Other", Enable = false };
 
-var qualiGroup = new XlDialogBox.GroupBox           { X = 209, Y = 093, Width = 250, Height = 063, Text = "&Qualifications" };
-var BaBsCheck = new XlDialogBox.CheckBox            { Text = "&BA / BS", IO_checked = true };
-var MaMsCheck = new XlDialogBox.CheckBox            { Text = "&MA / MS", IO_checked = true };
+    var qualiGroup = new XlDialogBox.GroupBox           { X = 209, Y = 093, W = 250, H = 063, Text = "&Qualifications" };
+    var BaBsCheck = new XlDialogBox.CheckBox            { Text = "&BA / BS", IO_checked = true };
+    var MaMsCheck = new XlDialogBox.CheckBox            { Text = "&MA / MS", IO_checked = true };
 
-// note: setting Trigger = true for PhD_Check (or any other triggerable control) will initiate the DDV callback function
-var PhD_Check = new XlDialogBox.CheckBox            { Text = "&PhD / other Grad", Trigger = true };
+    // note: setting Trigger = true for PhD_Check (or any other triggerable control) will initiate a 'validate' callback
+    var PhD_Check = new XlDialogBox.CheckBox            { Text = "&PhD / other Grad", Trigger = true };
 
-// The sequence of adding controls is important in view of the tab order.
-// Note: always put the  'labels' in front of their (edit/list) controls.
-dialog.Controls.Add(nameLabel);
-dialog.Controls.Add(nameEdit);
+    // The sequence of adding controls is important in view of the tab order.
+    // Note: always put the 'labels' *in front* of their (edit/list) controls.
 
-dialog.Controls.Add(refLabel);
-dialog.Controls.Add(refEdit);
+    dialog.Controls.Add(nameLabel);
+    dialog.Controls.Add(nameEdit);
 
-dialog.Controls.Add(listEdit);
+    dialog.Controls.Add(refLabel);
+    dialog.Controls.Add(refEdit);
 
-dialog.Controls.Add(educateBox);
-dialog.Controls.Add(RadioGroup);
-dialog.Controls.Add(RadioHarvr);
-dialog.Controls.Add(RadioOther);
+    dialog.Controls.Add(listEdit);
 
-dialog.Controls.Add(qualiGroup);
-dialog.Controls.Add(BaBsCheck);
-dialog.Controls.Add(MaMsCheck);
-dialog.Controls.Add(PhD_Check);
+    dialog.Controls.Add(CollegeBox);
+    dialog.Controls.Add(RadioGroup);
+    dialog.Controls.Add(RadioHarvr);
+    dialog.Controls.Add(RadioOther);
 
-dialog.Controls.Add(okBtn);
-dialog.Controls.Add(cancelBtn);
-dialog.Controls.Add(helpBtn);
+    dialog.Controls.Add(qualiGroup);
+    dialog.Controls.Add(BaBsCheck);
+    dialog.Controls.Add(MaMsCheck);
+    dialog.Controls.Add(PhD_Check);
 
-bool bOK = dialog.ShowDialog(validate);
-if (bOK == false) return;
+    dialog.Controls.Add(okBtn);
+    dialog.Controls.Add(cancelBtn);
+    dialog.Controls.Add(helpBtn);
 
-// now it is time to play around with the command to get things done
-var xlApp = (Application)ExcelDnaUtil.Application;
-var ws = xlApp.Sheets[1] as Worksheet;
-var range = ws.Cells[1, 1] as Range;
-range.Value2 = nameEdit.IO_string;
+    // define the method that is calling the dialog box so we can select the correct HelpTopic from ExcelCommand attribute 
+    dialog.CallingMethod = System.Reflection.MethodBase.GetCurrentMethod(); 
 
+    bool bOK = dialog.ShowDialog(validate);
+    if (bOK == false) return;
+
+    // now it is time to play around with the parameters chosen in the dialog box to get things done
+    var xlApp = (Application)ExcelDnaUtil.Application;
+    var ws = xlApp.Sheets[1] as Worksheet;
+    var range = ws.Cells[1, 1] as Range;
+    range.Value2 = nameEdit.IO_string;
+}
 ```
 
-#### Some guidance 
+### Some guidance 
 
 The dialog box definition table must be at least two rows high, and shall be seven columns wide.  The definition of the dialog itself is in the first row of the table. This row also specifies the default selected item and may contain the reference for the Help button in the Item number column.  
 
@@ -246,9 +279,13 @@ In the code for the dialog controls this is accomplished by setting `Enable = tr
 
 #### (In-) visible
 
-The `Visible` property  is **not part of** the built-in properties of the parameter table, but defined in the ControlItem class. When this property is false, the ControlItem is not added to the parameter table (***i. e. not shown at all***) in the dialog. Therefore the number of controls passed to the `ShowDialog(...)` function, need not be the same as the number of controls added to the dialog during initialization, using the `dialog.Controls.Add(...)` function. You need to be aware of this, when doing data validation.
+Unlike `trigger`and `disable` The `Visible` property  is **not officially part of** the documented properties of the dialog controls, but has been accomplished by a bit of a hack. Normally, there won't be much need to **hide** dialog items that have been defined in the `DialogDefinition` table; if needed, invalid controls can always be disabled. However, it is possible to hide dialog items by giving them an Item number > 24.  When this happens, a dialog item is not recognized and it is skipped from the tab-order. To implement this,  50 is added to any dialog item that needs to be 'hidden'.
 
 In the code for the dialog controls this is accomplished by setting `Visible = true / false`. 
+
+*Note: in the original implementation, `visible` was a property outside of the 7-parameter dialog item properties. This leads to complexities in creating the the N x 7 dialog table, as the invisible items do not show up in this table. This makes data validation rather complex, as both tables are (potentially) not in sync.*
+
+### Dialog items
 
 Most of the dialog items are simple and no further explanation is required. For some a little more explanation is helpful.
 
@@ -279,3 +316,109 @@ Linked list-boxes (16), linked file-boxes (18) and drop-down combo-boxes (22) sh
 Drop down combo-boxes return the value selected in the 7th column of the associated edit box and the position (counting from 1) of the selected item
 in the list in the 7th column of the combo-box item line.
 
+#### Validate()
+
+An example of a skeleton Validate() function is shown below.
+
+```c#
+static bool validate(int index, object[,] dialogResult, XlDialogBox.XlDialogControlCollection Controls)
+{
+    // just some code to set a break point
+    int i = index;
+    
+    // ...
+    // check user input
+    // code omitted
+    // ...
+
+    return true; 	// return to dialog; more work to be done with the dialog
+
+    // ...
+    // check user input
+    // code omitted
+    // ...
+    
+    return false;	// don't return to dialog; start evaluating user input and return to excel
+}
+```
+
+When the `trigger` functionality isn't used, then `Validate()` won't be called and it can be set at null, or can be omitted altogether in the call to `ShowDialog`  :
+
+```c#
+bool bOK = dialog.ShowDialog(null);
+// or:
+bool bOK = dialog.ShowDialog();
+```
+
+#### Building the code
+
+Finally, to successfully build the code, you need to copy the following source files to your solution:
+
+* XlDialogBox.cs
+* XlDialogBoxExtensions.cs
+
+And you need to have the following NuGet packages installed :
+
+* ExcelDna.AddIn by Govert van Drimmelen
+* ExcelDna.Integration by Govert van Drimmelen
+
+* ExcelDnaDoc by David Carlson (*essential for context sensitive help*)
+
+For questions or suggestions please use the [Excel-DNA](https://groups.google.com/g/exceldna) user group on Google.com.
+
+#### Testing the Dialog Layout
+
+Building a dialog based on X, Y, W, H parameters is all but a WYSIWYG process. It is more a trial and error approach.  There are several ways to go about making this easier, e.g. by first making reference dialogs using VBA or using WinForms, and copying their layout. Alternatively, one can (still) use Excel's built-in 4.0 Macro functionality, using the following steps:
+
+1. Open a new Excel workbook.
+
+2. Insert an XLM macro sheet by right-clicking on one of the worksheet tabs and selecting `Insert... -> MS Excel 4.0 Macro`.
+
+3. In the **macro sheet**, build the `DIALOG.BOX` functionality, by following these steps:
+
+   * in cell B2 place a label , say, **TestDialog**, and use this later as a name for the macro that starts at cell B3.
+   * In cell B3 place the formula `=DIALOG.BOX(DIALOG_DEFN)` – (the range `DIALOG_DEFN` is created in a later step).
+   * In cell B4 write  `=ALERT(IF(B3, "OK returned","Cancel returned"), 2, "XlmDialogExample-AddIn.chm!1001")` to check return values
+   * In cell B5 write `=RETURN(B3)` to return the value from `DIALOG.BOX()`. 
+
+4. Now we are done setting up the skeleton of the DIALOG.BOX() macro f unction. It's time to dress it up. First it needs a `DIALOG_DEFN'`. This can be done in either of two ways:
+
+   1. By using a *named range*
+   2. By a *range-reference*
+
+   In the example in **Figure 2** below, the range of N x 7 input parameters has been defined in cells `F3:L19` and has been passed to the dialog as a range-reference:  `DIALOG.BOX(F3:L19)`.
+
+5. For controls that are **list boxes** (type 15, or similar; see text above) the list of values to chose from needs to be defined separately. Again, this can be done in two ways:
+
+   1. By using a *named range*
+   2. By a *range-reference*
+
+6. In the example below, the list of 5 items has been defined in cells `B9:B13` and has been passed to the **list** as a range-reference:  `R9C2:R13C2`. Please note that for one reason or another, the list only accepts ranges defined in the *row-column* format.
+
+7. To make the TestDialog macro more accessible, please take the following steps from the Formulas Ribbon:
+
+   * Select Cell B2, containing the **TestDialog** label
+   * Select `Define Name` from the `Defined Names` group.
+   * This will bring up the `New Name` dialog, where you should define TestDialog as a Command, and for easy of access, add a Shortcut key. This is clarified in **Figure 3** below. 
+
+   Finally it is time play around with the dialog layout, before hardwiring this in C# code. Overall still a laborious process compared to the use of graphical design tools such as those that now exist in Visual Studio.
+
+   
+
+![image](./images/Dialog1MacroInput.png) 
+
+**Figure 2. The dialog from Figure 1, now defined in a Excel 4.0 Macro sheet**
+
+
+
+The Name dialog (from the Formulas ribbon) can be used to make the macro accessible using the `Ctrl+shift+D` key combination, as shown in **Figure 3**:
+
+![image](./images/NameDialog.png) 
+
+**Figure 3. Excel's Name dialog**
+
+
+
+An example spreadsheet called  [DialogBox.xlsb](DialogBox.xlsb) has been included in the project to assist.
+
+This [link](https://exceloffthegrid.com/using-excel-4-macro-functions/) provides some more information on use of Excel 4.0 macro's.
