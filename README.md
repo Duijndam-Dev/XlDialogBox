@@ -185,6 +185,8 @@ public static void Dialog1Command()
 }
 ```
 
+------
+
 ### Some guidance 
 
 The dialog box definition table must be at least two rows high, and shall be seven columns wide.  The definition of the dialog itself is in the first row of the table. This row also specifies the default selected item and may contain the reference for the Help button in the Item number column.  
@@ -203,7 +205,7 @@ The definitions of each column in a dialog definition table are listed in the fo
 
 #### Item number
 
-The first column in each row of the dialog definition table contains the item number. It is an enumeration with one out of 24 values shown in the following table that defines the type of dialog control being displayed. See the table below for different dialog control types.
+The first column in each row of the dialog definition table contains the item number. It is an enumeration with one out of 24 values shown in the following table that defines the type of dialog control item being displayed. See the table below for different dialog control types.
 
 #### Horizontal, vertical position, width and height
 
@@ -216,8 +218,6 @@ Describes the static text shown by an item.
 #### Initial value / result
 
 The last column in each row is used for data exchange. Whereas the data types of column 1 - 6 are given (string or int), column 7 can contain a number or a string.  To work with this column an IO object has been defined in the  `ControlItem` class.
-
-
 
 ***
 
@@ -252,42 +252,18 @@ The last column in each row is used for data exchange. Whereas the data types of
 
 #### Remarks
 
-A number of controls (*Integer edit box, Number edit box, Formula edit box and Reference edit box*) do internal data validation and may therefore prevent the OK button from exiting the dialog.
+A number of controls (*Integer edit box, Number edit box, Formula edit box and Reference edit box*) do internal data validation and may therefore prevent the OK button from exiting the dialog (for instance when you enter `1.5` in an Integer edit box (no. 8 on the enumeration table).
+
+------
+
+### Dialog items
+
+Most of the dialog items are simple and no further explanation is required. For some a little more explanation is helpful.
 
 #### Help (!!), Next, Back and Apply buttons
 
 I have **not** been able to make the `Help` button work. As a workaround a `help2` button has been derived from an OK button with `Initial value = -1`.
 Likewise, `Next`, `Back` and `Apply` buttons have been defined to help creating Wizard functionality.
-
-#### Triggers
-
-Adding 100 to certain item numbers causes the function to return control to the XLL when the item is clicked on with the dialog still displayed. 
-This "trigger feature" enables the `xlfDialogBox` command to alter the dialog, validate input and so on, and return for more user interaction. 
-The position of the item number chosen in this way is returned in the 1st row, 7th column of the returned array. 
-
-This feature does not work with static text (item 5) edit boxes (6, 7, 8, 9 and 10), group boxes (14), pictures (23) or the help button (24). 
-Those controls just ignore the trigger request if 100 would be added to their item numbers.
-
-In the code for the dialog controls this is accomplished by setting `Trigger = true / false`. 
-
-#### Disabling
-
-Adding 200 to any item number, disables (greys-out) the item. A disabled item cannot be chosen or selected. For example, 203 is a disabled OK button. 
-You could for instance use item 223 to include a picture in your dialog box that does not behave like a button.
-
-In the code for the dialog controls this is accomplished by setting `Enable = true / false`. 
-
-#### (In-) visible
-
-Unlike `trigger`and `disable` The `Visible` property  is **not officially part of** the documented properties of the dialog controls, but has been accomplished by a bit of a hack. Normally, there won't be much need to **hide** dialog items that have been defined in the `DialogDefinition` table; if needed, invalid controls can always be disabled. However, it is possible to hide dialog items by giving them an Item number > 24.  When this happens, a dialog item is not recognized and it is skipped from the tab-order. To implement this,  50 is added to any dialog item that needs to be 'hidden'.
-
-In the code for the dialog controls this is accomplished by setting `Visible = true / false`. 
-
-*Note: in the original implementation, `visible` was a property outside of the 7-parameter dialog item properties. This leads to complexities in creating the the N x 7 dialog table, as the invisible items do not show up in this table. This makes data validation rather complex, as both tables are (potentially) not in sync.*
-
-### Dialog items
-
-Most of the dialog items are simple and no further explanation is required. For some a little more explanation is helpful.
 
 #### Text and edit boxes
 
@@ -316,6 +292,38 @@ Linked list-boxes (16), linked file-boxes (18) and drop-down combo-boxes (22) sh
 Drop down combo-boxes return the value selected in the 7th column of the associated edit box and the position (counting from 1) of the selected item
 in the list in the 7th column of the combo-box item line.
 
+------
+
+### Special conditions
+
+Special dialog item conditions refer to 'triggers', 'enabling/disabling' as well as making dialog items 'visible/invisible' by increasing the Item number by 50 / 100 / 200, as described in the three paragraphs below.
+
+#### Triggers
+
+Adding 100 to certain item numbers causes the function to return control to the XLL when the item is clicked on, with the dialog still displayed. 
+This "trigger feature" enables the `xlfDialogBox` command to alter the dialog, validate input and so on, and return for more user interaction. 
+The position of the item number chosen in this way is returned in the 1st row, 7th column of the returned array. 
+
+This feature does not work with static text (item 5) edit boxes (6, 7, 8, 9 and 10), group boxes (14), pictures (23) or the help button (24). 
+Those controls just ignore the trigger request if 100 would be added to their item numbers.
+
+In the get/set code for the dialog control items this is accomplished by setting `Trigger = true / false`. 
+
+#### Disabling
+
+Adding 200 to any item number, disables (greys-out) the item. A disabled item cannot be chosen or selected. For example, 203 is a disabled OK button. 
+You could for instance use item 223 to include a picture in your dialog box that does not behave like a button.
+
+In the get/set code for the dialog control items this is accomplished by setting `Enable = true / false`. 
+
+#### (In-) visible
+
+Unlike `trigger`and `disable` The `Visible` property  is **not officially part of** the documented properties of the dialog controls, but has been accomplished by a bit of a hack. Normally, there won't be much need to **hide** dialog items that have been defined in the `DialogDefinition` table; if needed, invalid controls can always be disabled. However, it is possible to hide dialog items by giving them an Item number > 24.  When this happens, a dialog item is not recognized and it is skipped from the tab-order. To implement this,  50 is added to any dialog item that needs to be 'hidden'.
+
+In the get/set code for the dialog control items this is accomplished by setting `Visible = true / false`. 
+
+*Note: in the original implementation, `visible` was a property outside of the 7-parameter dialog item properties. This led to complexities in managing the the N x 7 dialog table, as the invisible items do not show up in this table. This makes data validation rather complex, as both tables are (potentially) not in sync.*
+
 #### Validate()
 
 An example of a skeleton Validate() function is shown below.
@@ -323,8 +331,8 @@ An example of a skeleton Validate() function is shown below.
 ```c#
 static bool validate(int index, object[,] dialogResult, XlDialogBox.XlDialogControlCollection Controls)
 {
-    // just some code to set a break point
-    int i = index;
+    // index is 0-based index of control that caused a trigger,leading us into this Validate() routine
+    int i = index;	// just some code to set a breakpoint at this line
     
     // ...
     // check user input
@@ -350,25 +358,29 @@ bool bOK = dialog.ShowDialog(null);
 bool bOK = dialog.ShowDialog();
 ```
 
-#### Building the code
+------
+
+### Building the code
 
 Finally, to successfully build the code, you need to copy the following source files to your solution:
 
-* XlDialogBox.cs
-* XlDialogBoxExtensions.cs
+* `XlDialogBox.cs` - source file containing all dialog classes
+* `XlDialogBoxExtensions.cs` - extension on `obj` used in `XlDialogBox.cs`
 
 And you need to have the following NuGet packages installed :
 
-* ExcelDna.AddIn by Govert van Drimmelen
-* ExcelDna.Integration by Govert van Drimmelen
+* `ExcelDna.AddIn` by Govert van Drimmelen
+* `ExcelDna.Integration` by Govert van Drimmelen
 
-* ExcelDnaDoc by David Carlson (*essential for context sensitive help*)
+* `ExcelDnaDoc` by David Carlson (*essential for context sensitive help*)
 
 For questions or suggestions please use the [Excel-DNA](https://groups.google.com/g/exceldna) user group on Google.com.
 
-#### Testing the Dialog Layout
+------
 
-Building a dialog based on X, Y, W, H parameters is all but a WYSIWYG process. It is more a trial and error approach.  There are several ways to go about making this easier, e.g. by first making reference dialogs using VBA or using WinForms, and copying their layout. Alternatively, one can (still) use Excel's built-in 4.0 Macro functionality, using the following steps:
+### Testing the Dialog Layout
+
+Building a dialog based on X, Y, W, H parameters is all but a WYSIWYG process. It is more a trial and error approach.  There are several ways to make this easier, e.g. by first creating 'reference' dialogs using VBA or using WinForms, and copying their layout. Alternatively, one can (still) use Excel's built-in 4.0 Macro functionality, using the following steps:
 
 1. Open a new Excel workbook.
 
@@ -376,32 +388,30 @@ Building a dialog based on X, Y, W, H parameters is all but a WYSIWYG process. I
 
 3. In the **macro sheet**, build the `DIALOG.BOX` functionality, by following these steps:
 
-   * in cell B2 place a label , say, **TestDialog**, and use this later as a name for the macro that starts at cell B3.
+   * in cell B2 place a label , say, **TestDialog**, and use this label later as a name for the macro that starts at cell B3.
    * In cell B3 place the formula `=DIALOG.BOX(DIALOG_DEFN)` – (the range `DIALOG_DEFN` is created in a later step).
    * In cell B4 write  `=ALERT(IF(B3, "OK returned","Cancel returned"), 2, "XlmDialogExample-AddIn.chm!1001")` to check return values
    * In cell B5 write `=RETURN(B3)` to return the value from `DIALOG.BOX()`. 
 
 4. Now we are done setting up the skeleton of the DIALOG.BOX() macro f unction. It's time to dress it up. First it needs a `DIALOG_DEFN'`. This can be done in either of two ways:
 
-   1. By using a *named range*
-   2. By a *range-reference*
+   1. By using a *named range* (`DIALOG_DEFN` as shown above)
+   2. By using a *range-reference* (As used in the code example)
 
    In the example in **Figure 2** below, the range of N x 7 input parameters has been defined in cells `F3:L19` and has been passed to the dialog as a range-reference:  `DIALOG.BOX(F3:L19)`.
 
 5. For controls that are **list boxes** (type 15, or similar; see text above) the list of values to chose from needs to be defined separately. Again, this can be done in two ways:
 
    1. By using a *named range*
-   2. By a *range-reference*
+   2. By using a *range-reference*
 
-6. In the example below, the list of 5 items has been defined in cells `B9:B13` and has been passed to the **list** as a range-reference:  `R9C2:R13C2`. Please note that for one reason or another, the list only accepts ranges defined in the *row-column* format.
+6. In the example below, the **list** of 5 items has been defined in cells `B9:B13` and has been passed to the **list control item** as a range-reference:  `R9C2:R13C2`. Please note that for one reason or another, the **list control item** only accepts ranges defined in the *row-column* format.
 
-7. To make the TestDialog macro more accessible, please take the following steps from the Formulas Ribbon:
+7. To make the **TestDialog** macro more accessible, please take the following steps from the Formulas Ribbon:
 
-   * Select Cell B2, containing the **TestDialog** label
-   * Select `Define Name` from the `Defined Names` group.
-   * This will bring up the `New Name` dialog, where you should define TestDialog as a Command, and for easy of access, add a Shortcut key. This is clarified in **Figure 3** below. 
-
-   Finally it is time play around with the dialog layout, before hardwiring this in C# code. Overall still a laborious process compared to the use of graphical design tools such as those that now exist in Visual Studio.
+   * Select Cell B2, containing the **TestDialog** label.
+   * Select `Define Name` from the `Defined Names` group in the `Formulas` ribbon.
+   * This will bring up the `New Name` dialog, where you should define `TestDialog` as a Command, and for easy of access, add a Shortcut key. This is clarified in **Figure 3** below. 
 
    
 
@@ -417,8 +427,10 @@ The Name dialog (from the Formulas ribbon) can be used to make the macro accessi
 
 **Figure 3. Excel's Name dialog**
 
+------
 
+### Get going...
 
-An example spreadsheet called  [DialogBox.xlsb](DialogBox.xlsb) has been included in the project to assist.
+Finally, it is now time to play around with the dialog layout, before hardwiring this in your C# code. Overall it is still a laborious process compared to using graphical design tools, like those in Visual Studio for user forms, but making some changes and testing them is now fairly quick and easy 😊.
 
-This [link](https://exceloffthegrid.com/using-excel-4-macro-functions/) provides some more information on use of Excel 4.0 macro's.
+An example spreadsheet [DialogBox.xlsb](DialogBox.xlsb) has been included in the project to assist. This [link](https://exceloffthegrid.com/using-excel-4-macro-functions/) provides more information on the use of Excel 4.0 macro's.

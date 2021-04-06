@@ -51,7 +51,7 @@ namespace XlmDialogExample
             var nameEdit = new XlDialogBox.TextEdit             { X = 019, Y = 029, IO_string = "<Name>" };
 
             var refLabel = new XlDialogBox.Label                { X = 019, Y = 050, Text = "&Reference" };
-            var refEdit = new XlDialogBox.RefEdit               { X = 019, Y = 067, W = 253, Visible = false};
+            var refEdit = new XlDialogBox.RefEdit               { X = 019, Y = 067, W = 253 };
 
             var listEdit = new XlDialogBox.ListBox()            { X = 019, Y = 099, W = 160, H = 96, IO_index = 2, Text = "GENERIC_List1" };
             listEdit.Items.AddRange(new string[]                { "Bake", "Broil", "Sizzle", "Fry", "Saute" });
