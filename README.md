@@ -443,8 +443,7 @@ Lastly, to help transferring the dialog layout into your C# code, two tables hav
 **Figure 4. A table that defines 16 controls and their layout, and the content of a list**
 
 
-
-<img src="./images/Dialog.png" alt="Dialog" style="zoom:90%"  align = "left" />
+![image](./images/Dialog.png) 
 
 **Figure 5. 16 controls added to the dialog, and the dialog called**
 
