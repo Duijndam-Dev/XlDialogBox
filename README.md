@@ -55,48 +55,48 @@ In `GENERIC.C` the following Dialog Definition table is defined:
 ```c
 static LPWSTR g_rgDialog[g_rgDialogRows][g_rgDialogCols] =
 {
-	{L"\000",   L"\000",    L"\000",    L"\003494", L"\003210", L"\025Generic Sample Dialog", L"\000"},
-	{L"\0011",  L"\003330", L"\003174", L"\00288",  L"\000",    L"\002OK",                    L"\000"},
-	{L"\0012",  L"\003225", L"\003174", L"\00288",  L"\000",    L"\006Cancel",                L"\000"},
-	{L"\0015",  L"\00219",  L"\00211",  L"\000",    L"\000",    L"\006&Name:",                L"\000"},
-	{L"\0016",  L"\00219",  L"\00229",  L"\003251", L"\000",    L"\000",                      L"\000"},
-	{L"\00214", L"\003305", L"\00215",  L"\003154", L"\00273",  L"\010&College",              L"\000"},
-	{L"\00211", L"\000",    L"\000",    L"\000",    L"\000",    L"\000",                      L"\0012"},
-	{L"\00212", L"\000",    L"\000",    L"\000",    L"\000",    L"\010&Harvard",              L"\000"},
-	{L"\00212", L"\000",    L"\000",    L"\000",    L"\000",    L"\006&Other",                L"\0011"},
-	{L"\0015",  L"\00219",  L"\00250",  L"\000",    L"\000",    L"\013&Reference:",           L"\000"},
-	{L"\00210", L"\00219",  L"\00267",  L"\003253", L"\000",    L"\000",                      L"\000"},
-	{L"\00214", L"\003209", L"\00293",  L"\003250", L"\00263",  L"\017&Qualifications",       L"\000"},
-	{L"\00213", L"\000",    L"\000",    L"\000",    L"\000",    L"\010&BA / BS",              L"\0011"},
-	{L"\00213", L"\000",    L"\000",    L"\000",    L"\000",    L"\010&MA / MS",              L"\0011"},
-	{L"\00213", L"\000",    L"\000",    L"\000",    L"\000",    L"\021&PhD / Other Grad",     L"\0010"},
-	{L"\00215", L"\00219",  L"\00299",  L"\003160", L"\00296",  L"\015GENERIC_List1",         L"\0011"},
+    {L"\000",   L"\000",    L"\000",    L"\003494", L"\003210", L"\025Generic Sample Dialog", L"\000"},
+    {L"\0011",  L"\003330", L"\003174", L"\00288",  L"\000",    L"\002OK",                    L"\000"},
+    {L"\0012",  L"\003225", L"\003174", L"\00288",  L"\000",    L"\006Cancel",                L"\000"},
+    {L"\0015",  L"\00219",  L"\00211",  L"\000",    L"\000",    L"\006&Name:",                L"\000"},
+    {L"\0016",  L"\00219",  L"\00229",  L"\003251", L"\000",    L"\000",                      L"\000"},
+    {L"\00214", L"\003305", L"\00215",  L"\003154", L"\00273",  L"\010&College",              L"\000"},
+    {L"\00211", L"\000",    L"\000",    L"\000",    L"\000",    L"\000",                      L"\0012"},
+    {L"\00212", L"\000",    L"\000",    L"\000",    L"\000",    L"\010&Harvard",              L"\000"},
+    {L"\00212", L"\000",    L"\000",    L"\000",    L"\000",    L"\006&Other",                L"\0011"},
+    {L"\0015",  L"\00219",  L"\00250",  L"\000",    L"\000",    L"\013&Reference:",           L"\000"},
+    {L"\00210", L"\00219",  L"\00267",  L"\003253", L"\000",    L"\000",                      L"\000"},
+    {L"\00214", L"\003209", L"\00293",  L"\003250", L"\00263",  L"\017&Qualifications",       L"\000"},
+    {L"\00213", L"\000",    L"\000",    L"\000",    L"\000",    L"\010&BA / BS",              L"\0011"},
+    {L"\00213", L"\000",    L"\000",    L"\000",    L"\000",    L"\010&MA / MS",              L"\0011"},
+    {L"\00213", L"\000",    L"\000",    L"\000",    L"\000",    L"\021&PhD / Other Grad",     L"\0010"},
+    {L"\00215", L"\00219",  L"\00299",  L"\003160", L"\00296",  L"\015GENERIC_List1",         L"\0011"},
 };
 ```
 
 **Table 1.**
 
-Where [LPWSTR](https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-dtyp/50e9ef83-d6fd-4e22-a34a-2c6b4e3c24f3) stands for a long (32-bit) pointer to a string containing wide (16-bit) Unicode characters. In the table above the strings are not null terminated; there length is defined upfront in octal code. E.g. in `L"\013&Reference:"`  we have 13 characters (base 8). This corresponds with  8+3 =  11 characters (base 10) followed by the 11 characters inside the string: `&Reference:`.  For readability it is easier to strip-off all the L"..." annotation.
+Where [LPWSTR](https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-dtyp/50e9ef83-d6fd-4e22-a34a-2c6b4e3c24f3) stands for a long (32-bit) pointer to a string containing wide (16-bit) Unicode characters. In the table above the strings are ***not*** null terminated; their length is defined upfront in octal format. E.g. in `L"\013&Reference:"`  we have 013 characters (base-8). This corresponds with  8+3 =  11 characters (base-10) followed by the 11 characters inside the string: `&Reference:`.  For readability it is easier to strip-off all the L"..." annotation.
 
 This gives the following table:
 
 ```c#
-    { 00, 000, 000, 494, 210, "Generic Sample Dialog", 0},	// 00 = Dialog ID
-    { 01, 330, 174, 088, 000, "OK",                    0},	// 01 = Default Ok Button
-    { 02, 225, 174, 088, 000, "Cancel",                0},	// 02 = Cancel button
-    { 05, 019, 011, 000, 000, "&Name:",                0},	// 05 = Text label
-    { 06, 019, 029, 251, 000, 0000,                    0},	// 06 = Text box
-    { 14, 305, 015, 154, 073, "&College",              0},	// 14 = Group box
-    { 11, 000, 000, 000, 000, 000,                     2},	// 11 = Radio button group
-    { 12, 000, 000, 000, 000, "&Harvard",              0},	// 12 = Radio button
-    { 12, 000, 000, 000, 000, "&Other",                1},	// 12 = Radio button
-    { 05, 019, 050, 000, 000, "&Reference:",           0},	// 05 = text label
-    { 10, 019, 067, 253, 000, 000,                     0},	// 10 = Reference edit box
-    { 14, 209, 093, 250, 063, "&Qualifications",       0},	// 14 = Group box
-    { 13, 000, 000, 000, 000, "&BA / BS",              1},	// 13 = Check box
-    { 13, 000, 000, 000, 000, "&MA / MS",              1},	// 13 = Check box
-    { 13, 000, 000, 000, 000, "&PhD / Other Grad",     0},	// 13 = Check box
-    { 15, 019, 099, 160, 096, "GENERIC_List1",         1},	// 15 = List box
+    { null, null, null,  494,  210, "Generic Sample Dialog", 0},	// 00 = Dialog ID
+    {   01,  330,  174,  088, null, "OK",                    0},	// 01 = Default Ok Button
+    {   02,  225,  174,  088, null, "Cancel",                0},	// 02 = Cancel button
+    {   05,  019,  011, null, null, "&Name:",                0},	// 05 = Text label
+    {   06,  019,  029,  251, null,  null,                   0},	// 06 = Text box
+    {   14,  305,  015,  154,  073, "&College",              0},	// 14 = Group box
+    {   11, null, null, null, null,  null,                   2},	// 11 = Radio button group
+    {   12, null, null, null, null, "&Harvard",              0},	// 12 = Radio button
+    {   12, null, null, null, null, "&Other",                1},	// 12 = Radio button
+    {   05,  019,  050, null, null, "&Reference:",           0},	// 05 = text label
+    {   10,  019,  067,  253, null,  null,                   0},	// 10 = Reference edit box
+    {   14,  209,  093,  250,  063, "&Qualifications",       0},	// 14 = Group box
+    {   13, null, null, null, null, "&BA / BS",              1},	// 13 = Check box
+    {   13, null, null, null, null, "&MA / MS",              1},	// 13 = Check box
+    {   13, null, null, null, null, "&PhD / Other Grad",     0},	// 13 = Check box
+    {   15,  019,  099,  160,  096, "GENERIC_List1",         1},	// 15 = List box
 
 ```
 
@@ -171,7 +171,8 @@ public static void Dialog1Command()
     dialog.Controls.Add(cancelBtn);
     dialog.Controls.Add(helpBtn);
 
-    // define the method that is calling the dialog box so we can select the correct HelpTopic from ExcelCommand attribute 
+    // Use reflection to define the method that is calling the dialog box, 
+    // so we can select the correct HelpTopic from the ExcelCommand attribute 
     dialog.CallingMethod = System.Reflection.MethodBase.GetCurrentMethod(); 
 
     bool bOK = dialog.ShowDialog(validate);
@@ -224,7 +225,7 @@ The last column in each row is used for data exchange. Whereas the data types of
 #### XlControl enumeration table
 
 | Dialog-box item                                              | Item number |
-| :----------------------------------------------------------- | ----------: |
+| ------------------------------------------------------------ | :---------: |
 | Default OK button                                            |           1 |
 | Cancel button                                                |           2 |
 | OK button                                                    |           3 |
@@ -391,21 +392,22 @@ Building a dialog based on X, Y, W, H parameters is all but a WYSIWYG process. I
    * in cell B2 place a label , say, **TestDialog**, and use this label later as a name for the macro that starts at cell B3.
    * In cell B3 place the formula `=DIALOG.BOX(DIALOG_DEFN)` – (the range `DIALOG_DEFN` is created in a later step).
    * In cell B4 write  `=ALERT(IF(B3, "OK returned","Cancel returned"), 2, "XlmDialogExample-AddIn.chm!1001")` to check return values
+     Or simply write `=ALERT(IF(B3, "OK returned", "Cancel returned"))` to do away with the `Help` button.
    * In cell B5 write `=RETURN(B3)` to return the value from `DIALOG.BOX()`. 
 
-4. Now we are done setting up the skeleton of the DIALOG.BOX() macro f unction. It's time to dress it up. First it needs a `DIALOG_DEFN'`. This can be done in either of two ways:
+4. Now we are done setting up the skeleton of the DIALOG.BOX() macro function. It's time to dress it up. First it needs a `DIALOG_DEFN'`. This can be done in either of two ways:
 
    1. By using a *named range* (`DIALOG_DEFN` as shown above)
    2. By using a *range-reference* (As used in the code example)
 
    In the example in **Figure 2** below, the range of N x 7 input parameters has been defined in cells `F3:L19` and has been passed to the dialog as a range-reference:  `DIALOG.BOX(F3:L19)`.
 
-5. For controls that are **list boxes** (type 15, or similar; see text above) the list of values to chose from needs to be defined separately. Again, this can be done in two ways:
+5. For controls that are **list boxes** (type 15, or similar; see text above under List-boxes) the list of values to chose from needs to be defined separately. Again, this can be done in one of two ways:
 
    1. By using a *named range*
    2. By using a *range-reference*
 
-6. In the example below, the **list** of 5 items has been defined in cells `B9:B13` and has been passed to the **list control item** as a range-reference:  `R9C2:R13C2`. Please note that for one reason or another, the **list control item** only accepts ranges defined in the *row-column* format.
+6. In the example below, the **list** of 5 items has been defined in cells `B9:B13` and has been passed to the **list control item** as a range-reference:  `R9C2:R13C2`. Please note that for one reason or another, the **list control item** only accepts ranges defined in the *row-column* (R1C1) format.
 
 7. To make the **TestDialog** macro more accessible, please take the following steps from the Formulas Ribbon:
 
@@ -427,10 +429,31 @@ The Name dialog (from the Formulas ribbon) can be used to make the macro accessi
 
 **Figure 3. Excel's Name dialog**
 
+
+
+Lastly, to help transferring the dialog layout into your C# code, two tables have been added to the spreadsheet.
+
+* The first table defines the controls and their layout, as well as that of one or more lists (if needed)
+* The second table add the controls to the dialog, and then shows the dialog
+
+
+
+![image](./images/Table1.png) 
+
+**Figure 4. A table that defines 16 controls and their layout, and the content of a list**
+
+
+
+<img src="./images/Dialog.png" alt="Dialog" style="zoom:90%"  align = "left" />
+
+**Figure 5. 16 controls added to the dialog, and the dialog called**
+
+
+
 ------
 
 ### Get going...
 
 Finally, it is now time to play around with the dialog layout, before hardwiring this in your C# code. Overall it is still a laborious process compared to using graphical design tools, like those in Visual Studio for user forms, but making some changes and testing them is now fairly quick and easy 😊.
 
-An example spreadsheet [DialogBox.xlsb](DialogBox.xlsb) has been included in the project to assist. This [link](https://exceloffthegrid.com/using-excel-4-macro-functions/) provides more information on the use of Excel 4.0 macro's.
+An example spreadsheet [DialogBox.xlsb](DialogBox.xlsb) has been included in the project to assist. This [link](https://exceloffthegrid.com/using-excel-4-macro-functions/) provides more information on the use of Excel 4.0 macro's. Here's some information on [programming with the C API](https://github.com/MicrosoftDocs/office-developer-client-docs/blob/master/docs/excel/programming-with-the-c-api-in-excel.md) in Excel, also covering the relation to XLM, the 'old' [XLM macro language](https://github.com/MicrosoftDocs/office-developer-client-docs/blob/master/docs/excel/programming-with-the-c-api-in-excel.md#c-api-and-its-relation-to-xlm).

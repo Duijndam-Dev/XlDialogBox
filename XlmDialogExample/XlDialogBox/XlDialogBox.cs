@@ -838,7 +838,17 @@ namespace ExcelDna.XlDialogBox
         }
 
         /// <summary>
-        ///     Dialog IO
+        ///     Access to 'raw' Dialog IO object
+        /// </summary>
+         public virtual object IO
+        {
+            get { return (_formControl.IO); }
+            set { _formControl.IO = value; }
+        }
+
+
+        /// <summary>
+        ///     access to index contained in Dialog IO
         /// </summary>
         public int IO_index
         {
