@@ -224,36 +224,46 @@ The last column in each row is used for data exchange. Whereas the data types of
 
 #### XlControl enumeration table
 
-| Dialog-box item                                              | Item number |
-| ------------------------------------------------------------ | :---------: |
-| Default OK button                                            |           1 |
-| Cancel button                                                |           2 |
-| OK button                                                    |           3 |
-| Default Cancel button                                        |           4 |
-| Static text                                                  |           5 |
-| Text edit box                                                |           6 |
-| Integer edit box                                             |           7 |
-| Number edit box                                              |           8 |
-| Formula edit box                                             |           9 |
-| Reference edit box                                           |          10 |
-| Option button group                                          |          11 |
-| Option button                                                |          12 |
-| Check box                                                    |          13 |
-| Group box                                                    |          14 |
-| List box                                                     |          15 |
-| Linked list box                                              |          16 |
-| Icons                                                        |          17 |
-| Linked file list box     (Microsoft Excel for Windows only)  |          18 |
-| Linked drive and directory box     (Microsoft Excel for Windows only) |          19 |
-| Directory text box                                           |          20 |
-| Drop-down list box                                           |          21 |
-| Drop-down combination edit/list box                          |          22 |
-| Picture button                                               |          23 |
-| Help button                                                  |          24 |
+| Dialog-box item                                              | Item number |  Implemented  |
+| ------------------------------------------------------------ | :---------: | :-----------: |
+| Default OK button                                            |      1      |      yes      |
+| Cancel button                                                |      2      |      yes      |
+| OK button                                                    |      3      |      yes      |
+| Default Cancel button                                        |      4      |      yes      |
+| Static text                                                  |      5      |      yes      |
+| Text edit box                                                |      6      |      yes      |
+| Integer edit box                                             |      7      |      yes      |
+| Number edit box                                              |      8      |      yes      |
+| Formula edit box                                             |      9      |      yes      |
+| Reference edit box                                           |     10      |      yes      |
+| Option button group                                          |     11      |      yes      |
+| Option button                                                |     12      |      yes      |
+| Check box                                                    |     13      |      yes      |
+| Group box                                                    |     14      |      yes      |
+| List box                                                     |     15      |      yes      |
+| Linked list box                                              |     16      |    **no**     |
+| Icons                                                        |     17      |      yes      |
+| Linked file list box     (Microsoft Excel for Windows only)  |     18      |    **no**     |
+| Linked drive and directory box     (Microsoft Excel for Windows only) |     19      |    **no**     |
+| Directory text box                                           |     20      |    **no**     |
+| Drop-down list box                                           |     21      |      yes      |
+| Drop-down combination edit/list box                          |     22      |      yes      |
+| Picture button                                               |     23      |    **no**     |
+| Help button                                                  |     24      | **different** |
 
 #### Remarks
 
-A number of controls (*Integer edit box, Number edit box, Formula edit box and Reference edit box*) do internal data validation and may therefore prevent the OK button from exiting the dialog (for instance when you enter `1.5` in an Integer edit box (no. 8 on the enumeration table).
+1. A number of controls (*Integer edit box, Number edit box, Formula edit box and Reference edit box*) do internal data validation and may therefore prevent the OK button from exiting the dialog (for instance when you enter `1.5` in an Integer edit box (no. 7 on the enumeration table).
+
+2. Recently (July 2021) Microsoft introduced a new macro security setting in Office-365 for Excel. It is related to abuse of these macros to spread malware. See these links for reference :
+
+   https://www.bleepingcomputer.com/news/microsoft/microsoft-is-disabling-excel-40-macros-by-default-to-protect-users/
+
+   https://thewindowsupdate.com/2021/07/22/restrict-usage-of-excel-4-0-xlm-macros-with-new-macro-settings-control/
+
+   To (re-) enable the XlDialogBox functionality, one needs to navigate to the Trust Center from `File -> Options -> Trust Center`. Then select `Trust Center Settings`. In the Trust Center navigate to `Macro Settings` and select `Enable Excel 4.0 macros when VBA macros are enabled`.
+
+   This should re-establish the desired functionality of XlDialogBox and the underlying DIALOG.BOX.
 
 ------
 
@@ -263,12 +273,13 @@ Most of the dialog items are simple and no further explanation is required. For 
 
 #### Help (!!), Next, Back and Apply buttons
 
-I have **not** been able to make the `Help` button work. As a workaround a `help2` button has been derived from an OK button with `Initial value = -1`.
-Likewise, `Next`, `Back` and `Apply` buttons have been defined to help creating Wizard functionality.
+I have **not** been able to make the `Help` button work as intended (*I.e. activate the right help topic from the compiled help file*). As a workaround, a `help2` button has been derived from an OK button using  `Initial value = -1`. Using reflection, the correct help information can be imported into the dialog: `dialog.CallingMethod = System.Reflection.MethodBase.GetCurrentMethod()`. This information is used when evaluating the return value from the `ShowDialog()` function to show the right help topic.
+
+In a similar manner, `Next`, `Back` and `Apply` buttons have been defined to help creating Wizard functionality.
 
 #### Text and edit boxes
 
-Vertical alignment of a text label to the text that appears in an edit box is important aesthetically. For edit boxes with the default height (set by leaving the height field blank) This is achieved by setting the vertical position of the text to be that of the edit box + 3.
+Vertical alignment of a text label to the text that appears in an edit box is important aesthetically. For edit boxes with the default height (set by leaving the height field blank) this is achieved by setting the vertical position of the text to that of the edit box + 3.
 
 #### Buttons
 
@@ -276,9 +287,7 @@ Selecting a cancel button (item 2 or 4) causes the dialog to terminate returning
 
 #### Radio buttons
 
-A group of radio buttons (12) must be preceded immediately by a radio group item (11) and must be uninterrupted by other item types. 
-If the radio group item has no text label, the group is not contained within a border. 
-If the height and/or width of the radio group are omitted but text is provided, a border is drawn that surrounds the radio buttons and their labels.
+A group of radio buttons (12) must be preceded immediately by a radio group item (11) and must be uninterrupted by other item types.  If the radio group item has no text label, the group is not contained within a border. If the height and/or width of the radio group are omitted but text is provided, a border is drawn that surrounds the radio buttons and their labels.
 
 #### List-boxes
 
@@ -292,6 +301,14 @@ Drop-down list-boxes (21) behave exactly as list boxes (15) except that the list
 Linked list-boxes (16), linked file-boxes (18) and drop-down combo-boxes (22) should be preceded immediately by an edit box that can support the data types in the list.  The lists themselves are drawn from the text field of the definition row which should be a range name or a string that represents a static array.  A linked path box (19) must be preceded immediately by a linked file-box (18).
 Drop down combo-boxes return the value selected in the 7th column of the associated edit box and the position (counting from 1) of the selected item
 in the list in the 7th column of the combo-box item line.
+
+#### Icons
+
+An icon (17) can have either 1, 2 or 3 in its Item text field. Any other value results in an error condition. The Initial value / result field is ignored. The following icons are shown:
+
+1. shows a white question mark in a blue circle 
+2. shows an upside-down exclamation mark in a blue circle
+3. shows an exclamation mark in a yellow warning triangle
 
 ------
 
@@ -373,7 +390,7 @@ And you need to have the following NuGet packages installed :
 * `ExcelDna.AddIn` by Govert van Drimmelen
 * `ExcelDna.Integration` by Govert van Drimmelen
 
-* `ExcelDnaDoc` by David Carlson (*essential for context sensitive help*)
+* `ExcelDnaDoc` by David Carlson (*for context sensitive help*)
 
 For questions or suggestions please use the [Excel-DNA](https://groups.google.com/g/exceldna) user group on Google.com.
 
@@ -381,7 +398,7 @@ For questions or suggestions please use the [Excel-DNA](https://groups.google.co
 
 ### Testing the Dialog Layout
 
-Building a dialog based on X, Y, W, H parameters is all but a WYSIWYG process. It is more a trial and error approach.  There are several ways to make this easier, e.g. by first creating 'reference' dialogs using VBA or using WinForms, and copying their layout. Alternatively, one can (still) use Excel's built-in 4.0 Macro functionality, using the following steps:
+Building a dialog based on X, Y, W, H parameters is all but a WYSIWYG process. It is more a trial and error process.  There are several ways to make this easier, e.g. by first creating 'reference' dialogs using VBA or using WinForms, and copying their layout. Alternatively, one can (still) use Excel's built-in 4.0 Macro functionality, using the following steps:
 
 1. Open a new Excel workbook.
 
@@ -395,7 +412,7 @@ Building a dialog based on X, Y, W, H parameters is all but a WYSIWYG process. I
      Or simply write `=ALERT(IF(B3, "OK returned", "Cancel returned"))` to do away with the `Help` button.
    * In cell B5 write `=RETURN(B3)` to return the value from `DIALOG.BOX()`. 
 
-4. Now we are done setting up the skeleton of the DIALOG.BOX() macro function. It's time to dress it up. First it needs a `DIALOG_DEFN'`. This can be done in either of two ways:
+4. Now we are done setting up the skeleton of the DIALOG.BOX() macro function. It's time to dress it up. First it needs a `DIALOG_DEFN`. This can be done in either of two ways:
 
    1. By using a *named range* (`DIALOG_DEFN` as shown above)
    2. By using a *range-reference* (As used in the code example)
@@ -429,12 +446,14 @@ The Name dialog (from the Formulas ribbon) can be used to make the macro accessi
 
 **Figure 3. Excel's Name dialog**
 
+------
 
+One downside of entering the dialog parameters in the **macro sheet**, is that *you cannot do cell based calculations* on such a sheet. It would be very useful, if you could position dialog controls, relative to other dialog controls. This can be done by letting `DIALOG_DEFN` point to an area of a 'normal' worksheet, and do all parameter tinkering in this worksheet. This has as added benefit that you can automate code generation using Excel's built in text handling routines. 
 
-Lastly, to help transferring the dialog layout into your C# code, two tables have been added to the spreadsheet.
+This  concept has been worked out in the included **DialogBox.xlsb** spreadsheet that contains four other dialog examples apart from GENERIC.C.  You can use `Ctrl+Shift+D` to test a dialog. Cell C2 on the macro sheet determines which dialog is being tested. The two tables in purple in each example contain text that can be directly pasted into Visual Studio. 
 
 * The first table defines the controls and their layout, as well as that of one or more lists (if needed)
-* The second table add the controls to the dialog, and then shows the dialog
+* The second table adds the controls to the dialog, and contains code to show the dialog
 
 
 
@@ -452,8 +471,11 @@ Lastly, to help transferring the dialog layout into your C# code, two tables hav
 
 ------
 
-### Get going...
+### To get going...
 
-Finally, it is now time to play around with the dialog layout, before hardwiring this in your C# code. Overall it is still a laborious process compared to using graphical design tools, like those in Visual Studio for user forms, but making some changes and testing them is now fairly quick and easy 😊.
+Finally, it is now time to play around with the dialog layout, before hardwiring this in your C# code. Overall it is still a laborious process compared to using graphical design tools - like those in Visual Studio for user forms - but making some changes and testing them is now fairly quick and easy 😊.
 
-An example spreadsheet [DialogBox.xlsb](DialogBox.xlsb) has been included in the project to assist. This [link](https://exceloffthegrid.com/using-excel-4-macro-functions/) provides more information on the use of Excel 4.0 macro's. Here's some information on [programming with the C API](https://github.com/MicrosoftDocs/office-developer-client-docs/blob/master/docs/excel/programming-with-the-c-api-in-excel.md) in Excel, also covering the relation to XLM, the 'old' [XLM macro language](https://github.com/MicrosoftDocs/office-developer-client-docs/blob/master/docs/excel/programming-with-the-c-api-in-excel.md#c-api-and-its-relation-to-xlm).
+As already mentioned, an example spreadsheet **DialogBox.xlsb** has been included in the project to assist. 
+
+This [link](https://exceloffthegrid.com/using-excel-4-macro-functions/) provides more information on the use of Excel 4.0 macro's. And here's some information on [programming with the C API](https://github.com/MicrosoftDocs/office-developer-client-docs/blob/master/docs/excel/programming-with-the-c-api-in-excel.md) in Excel, also covering the relation to XLM, the 'old' [XLM macro language](https://github.com/MicrosoftDocs/office-developer-client-docs/blob/master/docs/excel/programming-with-the-c-api-in-excel.md#c-api-and-its-relation-to-xlm).
+

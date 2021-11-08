@@ -140,7 +140,10 @@ namespace XlmDialogExample
             dialog.Controls.Add(helpBtn);
 
             // define the method that is calling the dialog box so we can select the correct HelpTopic from ExcelCommand attribute 
-            dialog.CallingMethod = System.Reflection.MethodBase.GetCurrentMethod(); 
+            dialog.CallingMethod = System.Reflection.MethodBase.GetCurrentMethod();
+
+            // only change scaling (default = 100) if the dialog has been designed on a display with a higher DPI setting than the standard 96 DPI.
+            // dialog.DialogScaling = 125.0;  // Use this if the dialog was designed using a display with 120 DPI
 
             bool bOK = dialog.ShowDialog(Validate);
             if (bOK == false) return;
