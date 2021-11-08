@@ -204,19 +204,19 @@ The definitions of each column in a dialog definition table are listed in the fo
 | Item text              |           6           |          5           |
 | Initial value / result |           7           |          6           |
 
-#### Item number
+#### Item number (1)
 
 The first column in each row of the dialog definition table contains the item number. It is an enumeration with one out of 24 values shown in the following table that defines the type of dialog control item being displayed. See the table below for different dialog control types.
 
-#### Horizontal, vertical position, width and height
+#### Horizontal, vertical position, width and height (2, 3, 4 and 5)
 
 These are integer numbers. They can be left undefined when items are part of a group box. To position an item at least horizontal and vertical position need to be defined. In that case the control gets a default size
 
-#### Item text
+#### Item text (6)
 
 Describes the static text shown by an item. 
 
-#### Initial value / result
+#### Initial value / result (7)
 
 The last column in each row is used for data exchange. Whereas the data types of column 1 - 6 are given (string or int), column 7 can contain a number or a string.  To work with this column an IO object has been defined in the  `ControlItem` class.
 
@@ -462,8 +462,7 @@ This  concept has been worked out in the included **DialogBox.xlsb** spreadsheet
 **Figure 4. A table that defines 16 controls and their layout, and the content of a list**
 
 
-
-<img src="./images/Dialog.png" alt="Dialog" style="zoom:90%"  align = "left" />
+![image](./images/Dialog.png) 
 
 **Figure 5. 16 controls added to the dialog, and the dialog called**
 
