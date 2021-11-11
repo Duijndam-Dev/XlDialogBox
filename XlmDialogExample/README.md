@@ -422,13 +422,6 @@ Building a dialog based on X, Y, W, H parameters is all but a WYSIWYG process. I
    * Select `Define Name` from the `Defined Names` group in the `Formulas` ribbon.
    * This will bring up the `New Name` dialog, where you should define `TestDialog` as a Command, and for easy of access, add a Shortcut key. This is clarified in **Figure 3** below. 
 
-8. Last but not least; in **Excel 365** you need to **enable Excel 4.0 macros**, in order to overcome the warning message "*Excel 4.0 (XLM) macros have been disabled due to your security settings.*" To (re-) enable Excel 4.0 macros, please go to File -> Options -> Trust Center ->  Trust Center Settings, to open the Trust Center. In the Trust Center, please go to Macro Settings and :
-
-   - <u>Enable</u> VBA Macros (not recommended; potentially dangerous code can run)
-   - <u>Enable</u> Excel 4.0 macros when VBA macros are enabled
-
-   Note: you'll have to close and reopen the spreadsheet for these changes to have effect.
-
    
 
 ![image](./images/Dialog1MacroInput.png) 
@@ -445,7 +438,7 @@ The Name dialog (from the Formulas ribbon) can be used to make the macro accessi
 
 ------
 
-One downside of entering the dialog parameters in the **macro sheet**, is that *you cannot do cell based calculations* on such a sheet. It would be very useful, if you could position dialog controls, *relative to* other dialog controls, using Excel's built-in functions. This can be done by letting `DIALOG_DEFN` point to an area in a 'normal' worksheet, and do all parameter tinkering in this worksheet. This has as added benefit that you can automate code generation using Excel's built in text handling routines. 
+One downside of entering the dialog parameters in the **macro sheet**, is that *you cannot do cell based calculations* on such a sheet. It would be very useful, if you could position dialog controls, relative to other dialog controls. This can be done by letting `DIALOG_DEFN` point to an area of a 'normal' worksheet, and do all parameter tinkering in this worksheet. This has as added benefit that you can automate code generation using Excel's built in text handling routines. 
 
 This  concept has been worked out in the included **DialogBox.xlsb** spreadsheet that contains four other dialog examples apart from GENERIC.C.  You can use `Ctrl+Shift+D` to test a dialog. Cell C2 on the macro sheet determines which dialog is being tested. The two tables in purple in each example contain text that can be directly pasted into Visual Studio. 
 

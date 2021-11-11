@@ -10,10 +10,13 @@ using ExcelDna.Integration;
 // The two original source files are coming from: https://github.com/zwq00000/ExcelDna-XlDialog.
 // Text in this file has been translated from Japanese ("文本编辑控件") to English ("Text editing controls") using:
 // https://translate.yandex.com/?lang=zh-en&text=%E6%96%87%E6%9C%AC%E7%BC%96%E8%BE%91%E6%8E%A7%E4%BB%B6
+
+// The project is uploaded to Github here: https://github.com/MrBeee/XlDialogBox
 // Several bugs have been fixed and various enhancements have been added.
 
 // Useful information on Excel 4.0 macro functions can be found here :
 // https://d13ot9o61jdzpp.cloudfront.net/files/Excel%204.0%20Macro%20Functions%20Reference.pdf
+
 
 #region XlDialogBox Introduction
 

@@ -84,6 +84,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="Properties\ExcelDna.Build.props" />
+    <None Include="README.md" />
     <None Include="XlmDialogExample-AddIn.dna" />
     <None Include="packages.config" />
   </ItemGroup>
