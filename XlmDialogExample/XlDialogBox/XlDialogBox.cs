@@ -11,7 +11,7 @@ using ExcelDna.Integration;
 // Text in this file has been translated from Japanese ("文本编辑控件") to English ("Text editing controls") using:
 // https://translate.yandex.com/?lang=zh-en&text=%E6%96%87%E6%9C%AC%E7%BC%96%E8%BE%91%E6%8E%A7%E4%BB%B6
 
-// The project is uploaded to Github here: https://github.com/MrBeee/XlDialogBox
+// The project is uploaded to Github here: https://github.com/Duijndam-Dev/XlDialogBox
 // Several bugs have been fixed and various enhancements have been added.
 
 // Useful information on Excel 4.0 macro functions can be found here :
@@ -186,7 +186,7 @@ This translates to the following using XlDialogBox
     var PhD_Check = new XlDialogBox.CheckBox               { Text = "&PhD / other Grad" };
 
     var listEdit = new XlDialogBox.ListBox()               { X = 019, Y = 099, Width = 160, Height = 96, SelectedIndex = 2 };
-    listEdit.Items.AddRange(new string[]                { "Bake", "Broil", "Sizzle", "Fry", "Saute" });
+    listEdit.Items.AddRange(new string[]                   { "Bake", "Broil", "Sizzle", "Fry", "Saute" });
 
     // The sequence of adding controls is important in view of the tab order.
     // Note: always put the 'labels' *in front* of their (edit/list) controls.
@@ -251,7 +251,7 @@ cpp_xloper UsernameDlg[NUM_DIALOG_ROWS * NUM_DIALOG_COLUMNS] =
     var addressEdit = new XlDialogBox.RefEdit()            { X = 101, Y = 114, Width = 202 };
 
     var labelForValue = new XlDialogBox.Label("&Value:")   { X = 027, Y = 156, Width = 068 };
-    var valueEdit = new XlDialogBox.TextEdit()              { X = 101, Y = 153, Width = 202, Value = "7" };
+    var valueEdit = new XlDialogBox.TextEdit()             { X = 101, Y = 153, Width = 202, Value = "7" };
 
     var okBtn = new XlDialogBox.OkButton()                 { X = 169, Y = 220, Width = 075, Height = 023, Text = "&OK" };
     var cancelBtn = new XlDialogBox.CancelButton()         { X = 250, Y = 220, Width = 075, Height = 023, Text = "&Cancel" };
@@ -317,7 +317,7 @@ cpp_xloper UsernameDlg[NUM_DIALOG_ROWS * NUM_DIALOG_COLUMNS] =
  * When I have time to develop a WPF Dialog Wizard instead, I'll need the code snippet below.
 
 // Code from : https://www.breezetree.com/blog/excel-refedit-in-c-sharp/
-#region ---- Select range ----------------------------------------
+
 private void btnSelectRange_Click(object sender, EventArgs e)
 {
     string prompt = "Select the range";
@@ -335,9 +335,7 @@ private void btnSelectRange_Click(object sender, EventArgs e)
         MessageBox.Show("An error occurred when selecting the range.", "Range Error");
     }
 }
-#endregion
 
-#region ---- static utility methods ----------------------------------------
 // Requires:
 // using System.Runtime.InteropServices;
 // using System.Windows.Forms;
@@ -450,7 +448,6 @@ public static void MRCO(object obj)
         obj = null;
     }
 }
-#endregion
 
 */
 
@@ -679,6 +676,17 @@ namespace ExcelDna.XlDialogBox
             XlHelpButton = 24,
 
             /// <summary>
+            ///     invisible + ItemNum
+            /// </summary>
+            /// <remarks>
+            ///     UNDOCUMENTED 'hack' to make items invisible by giving a dialog item an ItemNumber > 24
+            ///     This is a POSITIVE offset shifting the XlControl number out of range of the available control numbers
+            ///     A negative offset (e.g. by flipping the polarity) would lead to exceptions in Excel and must be avoided
+            ///     The concept is in line with "Trigger" which adds 100 and "Disable" which adds 200
+            /// </remarks>
+            XlInvisible = 50,
+
+            /// <summary>
             ///     trigger + ItemNum
             /// </summary>
             XlTrigger = 100,
@@ -689,18 +697,8 @@ namespace ExcelDna.XlDialogBox
             XlDisable = 200,
 
             // dummy to test code
-            XlInvisibleTextBox = 999,
+            XlInvisibleTextBox = 999
 
-            /// <summary>
-            ///     invisible + ItemNum
-            /// </summary>
-            /// <remarks>
-            ///     UNDOCUMENTED 'hack' to make items invisible by giving a dialog item an ItemNumber > 24
-            ///     This is a POSITIVE offset shifting the XlControl number out of range of the available control numbers
-            ///     A negative offset (e.g. by flipping the polarity) would lead to exceptions in Excel and must be avoided
-            ///     The concept is in line with "Trigger" which adds 100 and "Disable" which adds 200
-            /// </remarks>
-            XlInvisible = 50
         }
 
         /// <summary>
@@ -1470,467 +1468,9 @@ namespace ExcelDna.XlDialogBox
                     ID -= (int)XlControl.XlInvisible;
             }
         }
-        #endregion ControlItem  definition
+        #endregion ControlItem definition
 
-        #region Ok-Cancel-Help Buttons
-
-        /// <summary>
-        ///     (1 or 3) OK button; No longer sealed as other buttons are derived from it
-        /// </summary>
-        public class OkButton : ControlItem
-        {
-            public OkButton() : base(XlControl.XlOkButton)
-            {
-                Text = "&OK";
-            }
-
-            /// <summary>
-            /// This constructor takes the button text as input
-            /// </summary>
-            /// <param name="text">Button text</param>
-            public OkButton(string text) : base(XlControl.XlOkButton)
-            {
-                Text = text;
-            }
-
-            /// <summary>
-            ///     Is it the default button ?
-            /// </summary>
-            public bool Default
-            {
-                get { return ID == XlControl.XlDefaultOkButton; }
-                set { ID = value ? XlControl.XlDefaultOkButton : XlControl.XlOkButton; }
-            }
-
-            // experimental; see if we can use the IO Column for some fancy stuff
-            public int IO_int
-            {
-                get { return Convert.ToInt32(base.IO); }
-                set { base.IO = Convert.ToInt32(value); }
-            }
-        }
-
-        /// <summary>
-        ///     (2 or 4) Cancel button
-        /// </summary>
-        public sealed class CancelButton : ControlItem
-        {
-            public CancelButton() : base(XlControl.XlCancelButton)
-            {
-                Text = "&Cancel";
-            }
-
-            /// <summary>
-            /// This constructor takes the button text as input
-            /// </summary>
-            /// <param name="text">Button text</param>
-            public CancelButton(string text) : base(XlControl.XlOkButton)
-            {
-                Text = text;
-            }
-
-            /// <summary>
-            ///     Is it the default button
-            /// </summary>
-            public bool Default
-            {
-                get { return ID == XlControl.XlDefaultCancelButton; }
-                set { ID = value ? XlControl.XlDefaultCancelButton : XlControl.XlCancelButton; }
-            }
-        }
-
-        /// <summary>
-        ///     (24) Help button; it does NOT work !
-        /// </summary>
-        /// <remarks>
-        ///     It really does NOT work !
-        ///     As a Workaround, use an OkButton with "IO_int" set at '-1', and with "&Help" as button text.
-        ///     When the dialog box returns, "IO_int" will be evaluated and the help file will be called.
-        ///     
-        ///     In the mean time I ordered "Greg Harvey's Excel 4.0 for the MAC" from the US: 
-        ///     https://www.amazon.nl/gp/product/0679790446/ref=ppx_od_dt_b_asin_title_s00?ie=UTF8&psc=1
-        ///     Let's see if this book provides some more information how to deal with DIALOG.BOX
-        /// </remarks>
-        public sealed class HelpButton : ControlItem
-        {
-            public HelpButton() : base(XlControl.XlHelpButton)
-            {
-                Text = "&Help";
-            }
-
-            // Alas, Help does not work as intended ...
-            // Therefore use HelpButton2 as a workaround
-            public string IO_string
-            {
-                get { return Convert.ToString(base.IO); }
-                set { base.IO = Convert.ToString(value); }
-            }
-        }
-
-        /// <summary>
-        ///     (1 or 3) Help button; replacing the one that does not work...
-        /// </summary>
-        /// <remarks>
-        ///     As a Workaround, use OkButton with "IO_int" set at '-1', and with "&Help" as button text.
-        ///     ShowDialog will launch hh.exe with its _HelpTopic; and return to the dialog without data valdation.
-        /// </remarks>
-        public sealed class HelpButton2 : OkButton
-        {
-            public HelpButton2()
-            {
-                Text = "&Help";
-                IO_int = -1;
-            }
-        }
-
-        /// <summary>
-        ///     (1 or 3) Next button; for use in a dialog wizard
-        /// </summary>
-        /// <remarks>
-        ///     An OkButton is used with "IO_int" set at '1', and with "&Next >" as button text.
-        ///     When the dialog box returns, "IO_int" will be evaluated and data validation will be done.
-        /// </remarks>
-        public sealed class NextButton : OkButton
-        {
-            public NextButton()
-            {
-                Text = "&Next >";
-                IO_int = 1;
-            }
-        }
-
-        /// <summary>
-        ///     (1 or 3) Back button; for use in a dialog wizard
-        /// </summary>
-        /// <remarks>
-        ///     An OkButton is used with "IO_int" set at '2', and with "< &Back" as button text.
-        ///     When the dialog box returns, "IO_int" will be evaluated and data validation will be done.
-        /// </remarks>
-        public sealed class BackButton : OkButton
-        {
-            public BackButton()
-            {
-                Text = "< &Back";
-                IO_int = 2;
-            }
-        }
-
-        /// <summary>
-        ///     (1 or 3) Apply button; for use in a dialog wizard
-        /// </summary>
-        /// <remarks>
-        ///     An OkButton is used with "IO_int" set at '3', and with "&Apply" as button text.
-        ///     When the dialog box returns, "IO_int" will be evaluated and data validation will be done.
-        /// </remarks>
-        public sealed class ApplyButton : OkButton
-        {
-            public ApplyButton()
-            {
-                Text = "&Apply";
-                IO_int = 3;
-            }
-        }
-
-        #endregion Ok-Cancel-Help Buttons
-
-        #region Edits-CheckBoxes-RadioButtons-Icons
-        /// <summary>
-        ///     (5) Static text label
-        /// </summary>
-        public sealed class Label : ControlItem
-        {
-            public Label() : base(XlControl.XlStaticText)
-            {
-            }
-
-            public Label(string text) : this()
-            {
-                Text = text;
-            }
-        }
-
-        /// <summary>
-        ///     (6) Text box
-        /// </summary>
-        public class TextEdit : ControlItem
-        {
-            public TextEdit() : base(XlControl.XlTextBox)
-            {
-            }
-
-            public TextEdit(string text) : this()
-            {
-                IO_string = text;
-            }
-
-            /// <summary>
-            ///    Text box editing content 
-            ///    The override forces string entry into the IO object
-            /// </summary>
-            public string IO_string
-            {
-                get { return Convert.ToString(base.IO); }
-                set { base.IO = Convert.ToString(value); }
-            }
-        }
-
-
-        /// <summary>
-        ///     (7) Integer edit box
-        /// </summary>
-        /// <remarks>
-        /// this control does internal data validation, before allowing "OK" to exit the dialog
-        /// </remarks>
-        public class IntegerEdit : ControlItem
-        {
-
-            public IntegerEdit() : base(XlControl.XlIntegerEedit)
-            {
-            }
-
-            public IntegerEdit(int input) : this()
-            {
-                IO_int = input;
-            }
-
-            public int IO_int 
-            {
-                get { return Convert.ToInt32(base.IO); }
-                set { base.IO = Convert.ToInt32(value); }
-            }
-        }
-
-        /// <summary>
-        ///     (8) Double edit box
-        /// </summary>
-        /// <remarks>
-        /// this control does internal datavalidation, before allowing "OK" to exit the dialog
-        /// </remarks>
-        public class DoubleEdit : ControlItem
-        {
-            public DoubleEdit() : base(XlControl.XlNumberEdit)
-            {
-            }
-
-            public DoubleEdit(double input) : this()
-            {
-                IO_double = input;
-            }
-
-            public double IO_double
-            {
-                get { return Convert.ToDouble(base.IO); }
-                set { base.IO = Convert.ToDouble(value); }
-            }
-        }
-
-        /// <summary>
-        ///     (9) Formula editor control
-        /// </summary>
-        /// <remarks>
-        /// this control does internal datavalidation, before allowing "OK" to exit the dialog
-        /// </remarks>
-        public class FormulaEdit : ControlItem
-        {
-            public FormulaEdit() : base(XlControl.XlFormulaEdit)
-            {
-            }
-
-            public FormulaEdit(string text) : this()
-            {
-                IO_string = text;
-            }
-
-            /// <summary>
-            ///    Formula content
-            ///    The override forces string entry into the IO object
-            /// </summary>
-            public string IO_string
-            {
-                get { return Convert.ToString(base.IO); }
-                set { base.IO = Convert.ToString(value); }
-            }
-        }
-
-        /// <summary>
-        ///     (10) Cell reference edit control
-        /// </summary>
-        /// <remarks>
-        /// this control does internal datavalidation, before allowing "OK" to exit the dialog
-        /// </remarks>
-        public class RefEdit : ControlItem 
-        {
-            public RefEdit() : base(XlControl.XlReferenceEdit)
-            {
-            }
-             
-            public RefEdit(string text) : this()
-            {
-                IO_string = text;
-            }
-
-            /// <summary>
-            ///     Reference Address (R1C1)
-            ///    The override forces string entry into the IO object
-            /// </summary>
-            public string IO_string
-            {
-                get { return Convert.ToString(base.IO); }
-                set { base.IO = Convert.ToString(value); }
-            }
-
-        }
-
-        /// <summary>
-        ///     (11) Radio button group
-        /// </summary>
-        public class RadioButtonGroup : ControlItem
-        {
-            public RadioButtonGroup() : base(XlControl.XlRadioButtonGroup)
-            {
-            }
-
-            public RadioButtonGroup(string text) : this()
-            {
-                this.Text = text;
-            }
-
-            /// <summary>
-            ///     Select the index of the list starting from 0
-            ///     Not selected as -1
-            /// </summary>
-            /// <remarks>
-            ///     The built-in index starts at 1, externally it is exposed a 0-starting index as per .NET General Convention 
-            /// </remarks>
-            [DefaultValue(-1)]
-            public int IO_index
-            {
-                get
-                {
-                    if (IO.IsNull())
-                        return -1;
-                    else
-                        return Convert.ToInt32(base.IO) - 1;
-                }
-
-                set
-                {
-                    if (value < 0)
-                        base.IO = null;
-                    else
-                        base.IO = Convert.ToInt32(value + 1);
-                }
-            }
-        }
-
-        /// <summary>
-        ///     (12) Radio button
-        /// </summary>
-        public class RadioButton : ControlItem
-        {
-            public RadioButton() : base(XlControl.XlRadioButton)
-            {
-            }
-
-            public RadioButton(string text) : this()
-            {
-                this.Text = text;
-            }
-
-            /// <summary>
-            ///    Mainly used to *get* the status of the radio control being interrogated
-            ///    To *set* the active radio control, please use the SelectedIndex of the preceeding RadioGroupButton
-            /// </summary>
-            [DefaultValue(false)]
-            public bool IO_selected
-            {
-                get
-                {
-                    if (IO.IsNull())
-                        return false;
-                    else
-                        return Convert.ToBoolean(IO);
-                }
-
-                set 
-                {
-                    IO = Convert.ToBoolean(value);
-                }
-            }
-        }
-
-        /// <summary>
-        ///     (13) Check box
-        /// </summary>
-        public sealed class CheckBox : ControlItem
-        {
-            public CheckBox() : base(XlControl.XlCheckBox)
-            {
-            }
-
-            public CheckBox(string text) : base(XlControl.XlCheckBox)
-            {
-                this.Text = text;
-            }
-
-            /// <summary>
-            ///    (Re-)sets the checked status of the control
-            /// </summary>
-            public bool IO_checked
-            {
-                get
-                {
-                    if (IO.IsNull())
-                        return false;
-                    else
-                        return Convert.ToBoolean(IO);
-                }
-
-                set
-                {
-                    IO = Convert.ToBoolean(value);
-                }
-            }
-        }
-
-        /// <summary>
-        ///     (14) Group Box
-        /// </summary>
-        public sealed class GroupBox : ControlItem
-        {
-            public GroupBox() : base(XlControl.XlGroupBox)
-            {
-                X = Y = 10;
-            }
-
-            public GroupBox(string text) : this()
-            {
-                Text = text;
-            }
-        }
-
-        /// <summary>
-        ///     (17) Icon. Three icons are supported :
-        ///     1 - shows a white question mark in a blue circle
-        ///     2 - shows an upside-down exclamation mark in a blue circle
-        ///     3 - shows an exclamation mark in a yellow warning tringle    
-        /// </summary>
-        public sealed class Icon: ControlItem
-        {
-            public Icon() : base(XlControl.XlIcons)
-            {
-                Text = "1";
-            }
-
-            public Icon(string text) : this()
-            {
-                if ((text.Equals("1")) || (text.Equals("2")) || (text.Equals ("3")))
-                    Text = text;
-            }
-        }
-        #endregion Edits-CheckBoxes-RadioButtons-Icons
-
-        #region ListBox Controls
+        #region AbstractListControl definition
         public abstract class AbstractListControl : ControlItem
         {
 
@@ -1944,7 +1484,7 @@ namespace ExcelDna.XlDialogBox
             ///     Not selected as -1
             /// </summary>
             /// <remarks>
-            ///     The built-in index starts at 1, externally behaves as a 0-starting index of the composite .NET General Convention 
+            ///     The built-in index starts at 1, externally it behaves as a 0-starting index in-line with the composite .NET General Convention 
             /// </remarks>
             [DefaultValue(-1)]
             public int IO_index
@@ -2035,21 +1575,625 @@ namespace ExcelDna.XlDialogBox
                     }
                 }
             }
+        } // AbstractListControl
+
+        #endregion AbstractListControl definition
+
+        #region Controls 1 to 24
+
+        /// <summary>
+        ///     (1 or 3) OK button; No longer sealed as other buttons are derived from it
+        /// </summary>
+        /// <remarks>
+        ///     Default = true: The button appears with a thick black border around it and is selected when the user presses the Enter key.
+        ///     Closes the custom dialog box and enters the data from the box into the initial/result column of the definition table, 
+        ///     then returns control to the macro. To change the name of the button, enter a label other than OK in the text column of the definition table. 
+        ///
+        ///     Default = false: Closes the custom dialog box and enters the data from the dialog box into the initial/result column of the definition table, 
+        ///     then returns control to the macro. To change the name of the button, enter a label other than OK in the text column of the definition table
+        /// </remarks>
+        public class OkButton : ControlItem
+        {
+            public OkButton() : base(XlControl.XlOkButton)
+            {
+                Text = "&OK";
+            }
+
+            /// <summary>
+            /// This constructor takes the button text as input
+            /// </summary>
+            /// <param name="text">Button text</param>
+            public OkButton(string text) : base(XlControl.XlOkButton)
+            {
+                Text = text;
+            }
+
+            /// <summary>
+            ///     Is it the default button ?
+            /// </summary>
+            public bool Default
+            {
+                get { return ID == XlControl.XlDefaultOkButton; }
+                set { ID = value ? XlControl.XlDefaultOkButton : XlControl.XlOkButton; }
+            }
+
+            // experimental; see if we can use the IO Column for some fancy stuff
+            public int IO_int
+            {
+                get { return Convert.ToInt32(base.IO); }
+                set { base.IO = Convert.ToInt32(value); }
+            }
         }
 
         /// <summary>
+        ///     (2 or 4) Cancel button
+        /// </summary>
+        /// <remarks>
+        ///     Default = true: The button appears with a thick black border around it and is selected when the user presses the Enter key.
+        ///     Closes the custom dialog box and returns control to the macro, ignoring all options selected in the dialog box. 
+        ///     To change the name of the button, enter a label other than Cancel in the text column of the definition table. 
+        ///
+        ///     Default = false: Closes the custom dialog box and returns control to the macro, ignoring all options selected in the dialog box. 
+        ///     To change the name of the button, enter a label other than Cancel in the text column of the definition table.
+        /// </remarks>
+        public sealed class CancelButton : ControlItem
+        {
+            public CancelButton() : base(XlControl.XlCancelButton)
+            {
+                Text = "&Cancel";
+            }
+
+            /// <summary>
+            /// This constructor takes the button text as input
+            /// </summary>
+            /// <param name="text">Button text</param>
+            public CancelButton(string text) : base(XlControl.XlOkButton)
+            {
+                Text = text;
+            }
+
+            /// <summary>
+            ///     Is it the default button
+            /// </summary>
+            public bool Default
+            {
+                get { return ID == XlControl.XlDefaultCancelButton; }
+                set { ID = value ? XlControl.XlDefaultCancelButton : XlControl.XlCancelButton; }
+            }
+        }
+
+        /// <summary>
+        ///     (1 or 3) Help button; replacing the one that does not work...
+        /// </summary>
+        /// <remarks>
+        ///     As a Workaround, use OkButton with "IO_int" set at '-1', and with "&Help" as button text.
+        ///     ShowDialog will launch hh.exe with its _HelpTopic; and return to the dialog without data valdation.
+        /// </remarks>
+        public sealed class HelpButton2 : OkButton
+        {
+            public HelpButton2()
+            {
+                Text = "&Help";
+                IO_int = -1;
+            }
+        }
+
+        /// <summary>
+        ///     (1 or 3) Next button; for use in a dialog wizard
+        /// </summary>
+        /// <remarks>
+        ///     An OkButton is used with "IO_int" set at '1', and with "&Next >" as button text.
+        ///     When the dialog box returns, "IO_int" will be evaluated and data validation will be done.
+        /// </remarks>
+        public sealed class NextButton : OkButton
+        {
+            public NextButton()
+            {
+                Text = "&Next >";
+                IO_int = 1;
+            }
+        }
+
+        /// <summary>
+        ///     (1 or 3) Back button; for use in a dialog wizard
+        /// </summary>
+        /// <remarks>
+        ///     An OkButton is used with "IO_int" set at '2', and with "< &Back" as button text.
+        ///     When the dialog box returns, "IO_int" will be evaluated and data validation will be done.
+        /// </remarks>
+        public sealed class BackButton : OkButton
+        {
+            public BackButton()
+            {
+                Text = "< &Back";
+                IO_int = 2;
+            }
+        }
+
+        /// <summary>
+        ///     (1 or 3) Apply button; for use in a dialog wizard
+        /// </summary>
+        /// <remarks>
+        ///     An OkButton is used with "IO_int" set at '3', and with "&Apply" as button text.
+        ///     When the dialog box returns, "IO_int" will be evaluated and data validation will be done.
+        /// </remarks>
+        public sealed class ApplyButton : OkButton
+        {
+            public ApplyButton()
+            {
+                Text = "&Apply";
+                IO_int = 3;
+            }
+        }
+
+        /// <summary>
+        ///     (5) Static text label
+        /// </summary>
+        /// <remarks>
+        ///     Enters fixed text used for labeling other items in the custom dialog box or displaying messages.
+        /// </remarks>
+        public sealed class Label : ControlItem
+        {
+            public Label() : base(XlControl.XlStaticText)
+            {
+            }
+
+            public Label(string text) : this()
+            {
+                Text = text;
+            }
+        }
+
+        /// <summary>
+        ///     (6) Text box
+        /// </summary>
+        /// <remarks>
+        ///     Text edit box Creates a text box for entering text into the custom dialog box. The text column for this item is ignored. 
+        ///     (Use item 5 to label the box.) The initial/result column contains the initial value for this box.
+        /// </remarks>
+        public class TextEdit : ControlItem
+        {
+            public TextEdit() : base(XlControl.XlTextBox)
+            {
+            }
+
+            public TextEdit(string text) : this()
+            {
+                IO_string = text;
+            }
+
+            /// <summary>
+            ///    Text box editing content 
+            ///    The override forces string entry into the IO object
+            /// </summary>
+            public string IO_string
+            {
+                get { return Convert.ToString(base.IO); }
+                set { base.IO = Convert.ToString(value); }
+            }
+        }
+
+        /// <summary>
+        ///     (7) Integer edit box
+        /// </summary>
+        /// <remarks>
+        /// Note: this control does internal data validation, before allowing "OK" to exit the dialog.
+        /// 
+        /// Creates a text box for entering integers (between -32765 and 32767) into the custom dialog box. 
+        /// The text column for this item is ignored. (Use item 5 to label the box.) 
+        /// The initial/result column contains the initial integer for this box.
+        /// </remarks>
+        public class IntegerEdit : ControlItem
+        {
+
+            public IntegerEdit() : base(XlControl.XlIntegerEedit)
+            {
+            }
+
+            public IntegerEdit(int input) : this()
+            {
+                IO_int = input;
+            }
+
+            public int IO_int 
+            {
+                get { return Convert.ToInt32(base.IO); }
+                set { base.IO = Convert.ToInt32(value); }
+            }
+        }
+
+        /// <summary>
+        ///     (8) Double edit box
+        /// </summary>
+        /// <remarks>
+        /// Note: this control does internal datavalidation, before allowing "OK" to exit the dialog
+        /// 
+        /// Creates a text box for entering numbers (integers and decimals) into the custom dialog box. 
+        /// The text column for this item is ignored. (Use item 5 to label the box.) 
+        /// The initial/result column contains the initial number for this box.
+        /// </remarks>
+        public class DoubleEdit : ControlItem
+        {
+            public DoubleEdit() : base(XlControl.XlNumberEdit)
+            {
+            }
+
+            public DoubleEdit(double input) : this()
+            {
+                IO_double = input;
+            }
+
+            public double IO_double
+            {
+                get { return Convert.ToDouble(base.IO); }
+                set { base.IO = Convert.ToDouble(value); }
+            }
+        }
+
+        /// <summary>
+        ///     (9) Formula editor control
+        /// </summary>
+        /// <remarks>
+        /// Note: this control does internal datavalidation, before allowing "OK" to exit the dialog
+        /// 
+        /// Creates a text box for entering formulas into the custom dialog box. The text column for this item is ignored. (Use item 5 to label the box.) 
+        /// The program converts all cell references in the formula to the R1C1 system in the form of text in the initial/result column 
+        /// but converts these cell references in the custom dialog box to whatever cell reference system is selected in the Workspace dialog box. 
+        /// If the user enters a constant, Excel adds an equal sign before it. If the user enters text, the program encloses it in quotation marks.
+        /// </remarks>
+        public class FormulaEdit : ControlItem
+        {
+            public FormulaEdit() : base(XlControl.XlFormulaEdit)
+            {
+            }
+
+            public FormulaEdit(string text) : this()
+            {
+                IO_string = text;
+            }
+
+            /// <summary>
+            ///    Formula content
+            ///    The override forces string entry into the IO object
+            /// </summary>
+            public string IO_string
+            {
+                get { return Convert.ToString(base.IO); }
+                set { base.IO = Convert.ToString(value); }
+            }
+        }
+
+        /// <summary>
+        ///     (10) Cell reference edit control
+        /// </summary>
+        /// <remarks>
+        /// Note: this control does internal datavalidation, before allowing "OK" to exit the dialog
+        /// 
+        /// Creates a text box for entering cell references into the custom dialog box. The text column for this item is ignored. (Use item 5 to label the box.) 
+        /// Cell references in the initial/result column are entered in the R1C1 cell reference system in the form of text. 
+        /// When these references are displayed in the custom dialog box, Excel converts them to whatever cell reference system is selected in the Workspace dialog box.
+        /// </remarks>
+        public class RefEdit : ControlItem 
+        {
+            public RefEdit() : base(XlControl.XlReferenceEdit)
+            {
+            }
+             
+            public RefEdit(string text) : this()
+            {
+                IO_string = text;
+            }
+
+            /// <summary>
+            ///     Reference Address (R1C1)
+            ///    The override forces string entry into the IO object
+            /// </summary>
+            public string IO_string
+            {
+                get { return Convert.ToString(base.IO); }
+                set { base.IO = Convert.ToString(value); }
+            }
+
+        }
+
+        /// <summary>
+        ///     (11) Radio button group
+        /// </summary>
+        /// <remarks>
+        ///     This item must precede in the row directly above the rows containing the radio buttons (see below). 
+        ///     The label entered in the text column becomes the label for the group. 
+        ///     Enter the number of the option button to be selected by default in the initial/result column.
+        ///     If no value is entered in this column. Excel selects the first option button as the default. 
+        ///     If the initial/result column contains the #N/A value, none of the option buttons in the group is selected. 
+        ///     This item does not produce a visible group box. (For this to happen, use a group box.)
+        /// </remarks>
+        public class RadioButtonGroup : ControlItem
+        {
+            public RadioButtonGroup() : base(XlControl.XlRadioButtonGroup)
+            {
+            }
+
+            public RadioButtonGroup(string text) : this()
+            {
+                this.Text = text;
+            }
+
+            /// <summary>
+            ///     Select the index of the list starting from 0
+            ///     Not selected as -1
+            /// </summary>
+            /// <remarks>
+            ///     Note: the built-in index starts at 1, externally it is exposed a 0-starting index as per .NET General Convention 
+            /// </remarks>
+            [DefaultValue(-1)]
+            public int IO_index
+            {
+                get
+                {
+                    if (IO.IsNull())
+                        return -1;
+                    else
+                        return Convert.ToInt32(base.IO) - 1;
+                }
+
+                set
+                {
+                    if (value < 0)
+                        base.IO = null;
+                    else
+                        base.IO = Convert.ToInt32(value + 1);
+                }
+            }
+        }
+
+        /// <summary>
+        ///     (12) Radio button
+        /// </summary>
+        /// <remarks>
+        ///     Creates an option button with the name entered in the text column.
+        /// </remarks>
+        public class RadioButton : ControlItem
+        {
+            public RadioButton() : base(XlControl.XlRadioButton)
+            {
+            }
+
+            public RadioButton(string text) : this()
+            {
+                this.Text = text;
+            }
+
+            /// <summary>
+            ///    Mainly used to *get* the status of the radio control being interrogated
+            ///    To *set* the active radio control, please use the SelectedIndex of the preceeding RadioGroupButton
+            /// </summary>
+            [DefaultValue(false)]
+            public bool IO_selected
+            {
+                get
+                {
+                    if (IO.IsNull())
+                        return false;
+                    else
+                        return Convert.ToBoolean(IO);
+                }
+
+                set 
+                {
+                    IO = Convert.ToBoolean(value);
+                }
+            }
+        }
+
+        /// <summary>
+        ///     (13) Check box
+        /// </summary>
+        /// <remarks>
+        ///     Creates a check box with the name entered in the text column. 
+        ///     If you enter TRUE in the initial/result column, the check box is selected. 
+        ///     If you enter FALSE, the check box is empty. If you enter the value #N/A, the check box is grayed.
+        /// </remarks>
+        public sealed class CheckBox : ControlItem
+        {
+            public CheckBox() : base(XlControl.XlCheckBox)
+            {
+            }
+
+            public CheckBox(string text) : base(XlControl.XlCheckBox)
+            {
+                this.Text = text;
+            }
+
+            /// <summary>
+            ///    (Re-)sets the checked status of the control
+            /// </summary>
+            public bool IO_checked
+            {
+                get
+                {
+                    if (IO.IsNull())
+                        return false;
+                    else
+                        return Convert.ToBoolean(IO);
+                }
+
+                set
+                {
+                    IO = Convert.ToBoolean(value);
+                }
+            }
+        }
+
+        /// <summary>
+        ///     (14) Group Box
+        /// </summary>
+        /// <remarks>
+        ///     CDraws a box around a group of related items. The label entered in the initial/result column is displayed as the group label. 
+        ///     Enter this item and its definition in the row immediately above the ones containing the items you want to group.
+        /// </remarks>
+        /// 
+        public sealed class GroupBox : ControlItem
+        {
+            public GroupBox() : base(XlControl.XlGroupBox)
+            {
+                X = Y = 10;
+            }
+
+            public GroupBox(string text) : this()
+            {
+                Text = text;
+            }
+        }
+        /// <summary>
         ///     (15) List Box
         /// </summary>
+        /// <remarks>
+        ///     Creates a list box. Enter the number of the default item in the initial/result column.
+        ///     If this column is empty, the first item in the list is selected by default. 
+        ///     If the initial/result column contains the #N/A value, no item is selected in the list box. 
+        ///     To label the list box, use a TextEdit. (See above.)
+        ///     
+        ///     Note: for the original 'bare' listbox control to work, the following needs to be implemented:
+        ///     Enter a reference in the text column to the cell range or array that contains the items to be listed in this list box. Or:
+        ///     Enter the name of the cell range containing the items or cell references as R1C1 text in the text column. 
+        ///     
+        ///     Note: In the ListBox control this requirement is taken care of by the function AddRange().
+        ///     AddRange() adds an array of strings to the control for it to choose from.
+        /// 
+        /// </remarks>
         public class ListBox : AbstractListControl
         {
             public ListBox() : base(XlControl.XlListBox) {}
         }
 
         /// <summary>
-        ///     Combo box control
+        ///     (16) Linked List Box
         /// </summary>
         /// <remarks>
-        ///     A Text edit control is required directly before the combo box
+        ///     Note: A Linked List Box needs to be preceeded by a Text Edit Box
+        ///     
+        ///     Same as a ListBox except that the program enters the default item in the list box in a linked text box where the user can edit it. 
+        ///     When using this item, you need to precede it with a text edit box (item 6).
+        /// </remarks>
+        public class LinkedListBox : AbstractListControl
+        {
+            public LinkedListBox() : base(XlControl.XlLinkedListBox) {}
+        }
+
+        /// <summary>
+        ///     (17) Icon. Three icons are supported :
+        ///     1 - shows a white question mark in a blue circle
+        ///     2 - shows an upside-down exclamation mark in a blue circle
+        ///     3 - shows an exclamation mark in a yellow warning tringle    
+        /// </summary>
+        /// <remarks>
+        ///    Displays one of three icons. 
+        ///    When the initial/result column contains 1, the icon is the question mark. 
+        ///    When the column contains 2, the icon is the i in bold. 
+        ///    When the column contains 3, the icon is the exclamation point
+        /// </remarks>
+        public sealed class Icon: ControlItem
+        {
+            public Icon() : base(XlControl.XlIcons)
+            {
+                Text = "1";
+            }
+
+            public Icon(string text) : this()
+            {
+                if ((text.Equals("1")) || (text.Equals("2")) || (text.Equals ("3")))
+                    Text = text;
+            }
+        }
+
+        /// <summary>
+        ///     (18) Linked List File List Box
+        /// </summary>
+        /// <remarks>
+        ///     Note: A Linked List File Box needs to be preceeded by a Text Edit Box
+        ///     
+        ///     Lists the files in a directory. This item must precede a linked drive and directory list box (item 19—see below) 
+        ///     and must itself be preceded by a text edit box (item 6) where the user can edit the filename. 
+        ///     The text column for this item is ignored.
+        /// </remarks>
+        public class LinkedFilesList : AbstractListControl
+        {
+            public LinkedFilesList() : base(XlControl.XlLinkedFileListBox) {}
+        }
+
+        /// <summary>
+        ///     (19) Linked Drive/Dir List Box
+        /// </summary>
+        /// <remarks>
+        ///     Note: A Linked List File Box needs to be preceeded by a Text Edit Box
+        ///     
+        ///     Similar to item 18 except that it lists the available drives and directories.
+        /// </remarks>
+        public class LinkedDriveList : AbstractListControl
+        {
+            public LinkedDriveList() : base(XlControl.XlLinkedDriveDirBox) {}
+        }
+
+        /// <summary>
+        ///     (20) Static Directory text label
+        /// </summary>
+        /// <remarks>
+        ///     Displays the name of the current directory, which doesn't change when the user chooses a new directory. 
+        ///     To have the directoiy updated, use a Text item (item 5) followed by a Linked file list box (item 19). 
+        ///     The text and initial/result columns for this item are both ignored
+        /// </remarks>
+        public sealed class DirectoryLabel : ControlItem
+        {
+            public DirectoryLabel() : base(XlControl.XlDirectoryTextbox)
+            {
+            }
+
+        }
+
+        /// <summary>
+        ///     (21) Drop-down list controls
+        /// </summary>
+        /// <remarks>
+        ///     Displays a list of items in a drop-down list box. 
+        ///     Enter the number of the default item in the initial/result column. 
+        ///     If this column is empty, the first item in the list is selected by default. 
+        ///     If the initial/result column contains the #N/A value, no item is selected in the list box.
+        ///     
+        ///     The value entered into the height column determines the length of the drop-down list box when it is displayed in the custom dialog box
+        ///     
+        ///     Note: for the original 'bare' listbox control to work, the following needs to be implemented:
+        ///     Enter a reference in the text column to the cell range or array that contains the items to be listed in this list box. 
+        ///     Enter the name of the cell range containing the items or cell references as R l C l text. 
+        ///     
+        ///     Note: In the DropdownList control this requirement is taken care of by the function AddRange().
+        ///     AddRange() adds an array of strings to the control for it to choose from.
+
+        /// </remarks>
+        public class DropdownList : AbstractListControl {
+            public DropdownList() : base(XlControl.XlDropdownList) {
+            }
+
+            /// <summary>
+            ///     Selected values
+            /// </summary>
+            public string ValueAtIndex {
+                get {
+                    int index = IO_index;
+                    if (index < 0) {
+                        return string.Empty;
+                    }
+                    return Items.ElementAt(index);
+                }
+            }
+        }
+
+        /// <summary>
+        ///     (22) Combo box control
+        /// </summary>
+        /// <remarks>
+        ///     Note: a Text edit control is required directly before the combo box
+        ///     
+        ///     Like a DropdownList except that this item must be preceded by a text edit box (item 6) where the user can edit the selected item in the list.
         /// </remarks>
         public class ComboBox : AbstractListControl 
         {
@@ -2123,7 +2267,6 @@ namespace ExcelDna.XlDialogBox
             /// <summary>
             ///     Active control definition array
             /// </summary>
-            /// <returns></returns>
             public override IEnumerable<object[]> GetControlParameters() 
             {
                 return new[] { _innerTextBox.GetControlParameters().FirstOrDefault(), base.ControlParameters };
@@ -2131,27 +2274,51 @@ namespace ExcelDna.XlDialogBox
         }
 
         /// <summary>
-        ///     (21) Drop-down list controls
+        ///     (23) Picture Button
         /// </summary>
-        public class DropdownList : AbstractListControl {
-            public DropdownList() : base(XlControl.XlDropdownList) {
+        /// <remarks>
+        ///     Not implemented
+        ///     
+        ///     Creates a button that works like the OK button but that displays the specified graphic object. 
+        ///     A picture button can be any graphic object created with Excel's drawing tools. (See Chapter 14.)
+        ///     Enter the object's idendfier in the text column (an object's identifier is displayed in the formula bar when you select it), as in "Rectangle 1." 
+        ///     To display a graphic object in a custom dialog box without making it a button that you can press, enter the item number 223.
+        /// </remarks>
+
+        /// <summary>
+        ///     (24) Help button; it does NOT work as intended!
+        /// </summary>
+        /// <remarks>
+        ///     Displays the custom Help topic for the dialog box. The Help topic reference (Help filename and topic number separated by an exclamation point) 
+        ///     can be entered in the first cell in the dialog box definition table or in the Help button's initial/result column. 
+        ///     The button's default name is Help. To change this name, enter a label in the button's text column
+        /// 
+        ///     Unfortunately, it really does NOT work !
+        /// 
+        ///     As a Workaround, use an OkButton with "IO_int" set at '-1', and with "&Help" as button text.
+        ///     When the dialog box returns, "IO_int" will be evaluated and the help file will be called.
+        ///     
+        ///     In the mean time I ordered "Greg Harvey's Excel 4.0 for the MAC" from the US: 
+        ///     https://www.amazon.nl/gp/product/0679790446/ref=ppx_od_dt_b_asin_title_s00?ie=UTF8&psc=1
+        ///     Let's see if this book provides some more information how to deal with DIALOG.BOX
+        /// </remarks>
+        public sealed class HelpButton : ControlItem
+        {
+            public HelpButton() : base(XlControl.XlHelpButton)
+            {
+                Text = "&Help";
             }
 
-            /// <summary>
-            ///     Selected values
-            /// </summary>
-            public string ValueAtIndex {
-                get {
-                    int index = IO_index;
-                    if (index < 0) {
-                        return string.Empty;
-                    }
-                    return Items.ElementAt(index);
-                }
+            // Alas, Help does not work as intended ...
+            // Therefore use HelpButton2 as a workaround
+            public string IO_string
+            {
+                get { return Convert.ToString(base.IO); }
+                set { base.IO = Convert.ToString(value); }
             }
         }
 
-        #endregion ListBox Controls
+        #endregion Controls 1 to 24
 
         #region Dialog Control Collection
         /// <summary>

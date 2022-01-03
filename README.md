@@ -241,11 +241,11 @@ The last column in each row is used for data exchange. Whereas the data types of
 | Check box                                                    |     13      |      yes      |
 | Group box                                                    |     14      |      yes      |
 | List box                                                     |     15      |      yes      |
-| Linked list box                                              |     16      |    **no**     |
+| Linked list box                                              |     16      |      yes      |
 | Icons                                                        |     17      |      yes      |
-| Linked file list box     (Microsoft Excel for Windows only)  |     18      |    **no**     |
-| Linked drive and directory box     (Microsoft Excel for Windows only) |     19      |    **no**     |
-| Directory text box                                           |     20      |    **no**     |
+| Linked file list box     (Microsoft Excel for Windows only)  |     18      |      yes      |
+| Linked drive and directory box     (Microsoft Excel for Windows only) |     19      |      yes      |
+| Directory text box                                           |     20      |      yes      |
 | Drop-down list box                                           |     21      |      yes      |
 | Drop-down combination edit/list box                          |     22      |      yes      |
 | Picture button                                               |     23      |    **no**     |
@@ -312,8 +312,7 @@ Adding 100 to certain item numbers causes the function to return control to the 
 This "trigger feature" enables the `xlfDialogBox` command to alter the dialog, validate input and so on, and return for more user interaction. 
 The position of the item number chosen in this way is returned in the 1st row, 7th column of the returned array. 
 
-This feature does not work with static text (item 5) edit boxes (6, 7, 8, 9 and 10), group boxes (14), pictures (23) or the help button (24). 
-Those controls just ignore the trigger request if 100 would be added to their item numbers.
+This feature does not work with static text (item 5) edit boxes (6, 7, 8, 9 and 10), group boxes (14), pictures (23) or the help button (24).  Those controls just ignore the trigger request if 100 would be added to their item numbers.
 
 In the get/set code for the dialog control items this is accomplished by setting `Trigger = true / false`. 
 
@@ -471,7 +470,7 @@ This  concept has been worked out in the included **DialogBox.xlsb** spreadsheet
 
 Finally, it is now time to play around with the dialog layout, before hardwiring this in your C# code. Overall it is still a laborious process compared to using graphical design tools - like those in Visual Studio for user forms - but making some changes and testing them is now fairly quick and easy 😊.
 
-As already mentioned, an example spreadsheet **DialogBox.xlsb** has been included in the project to assist. 
+As already mentioned, an example spreadsheet **[DialogBox.xlsb](DialogBox.xlsb)** has been included in the project to assist. 
 
 This [link](https://exceloffthegrid.com/using-excel-4-macro-functions/) provides more information on the use of Excel 4.0 macro's. And here's some information on [programming with the C API](https://github.com/MicrosoftDocs/office-developer-client-docs/blob/master/docs/excel/programming-with-the-c-api-in-excel.md) in Excel, also covering the relation to XLM, the 'old' [XLM macro language](https://github.com/MicrosoftDocs/office-developer-client-docs/blob/master/docs/excel/programming-with-the-c-api-in-excel.md#c-api-and-its-relation-to-xlm).
 

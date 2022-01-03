@@ -241,11 +241,11 @@ The last column in each row is used for data exchange. Whereas the data types of
 | Check box                                                    |     13      |      yes      |
 | Group box                                                    |     14      |      yes      |
 | List box                                                     |     15      |      yes      |
-| Linked list box                                              |     16      |    **no**     |
+| Linked list box                                              |     16      |      yes      |
 | Icons                                                        |     17      |      yes      |
-| Linked file list box     (Microsoft Excel for Windows only)  |     18      |    **no**     |
-| Linked drive and directory box     (Microsoft Excel for Windows only) |     19      |    **no**     |
-| Directory text box                                           |     20      |    **no**     |
+| Linked file list box     (Microsoft Excel for Windows only)  |     18      |      yes      |
+| Linked drive and directory box     (Microsoft Excel for Windows only) |     19      |      yes      |
+| Directory text box                                           |     20      |      yes      |
 | Drop-down list box                                           |     21      |      yes      |
 | Drop-down combination edit/list box                          |     22      |      yes      |
 | Picture button                                               |     23      |    **no**     |
@@ -289,8 +289,7 @@ Drop-down list-boxes (21) behave exactly as list boxes (15) except that the list
 #### Linked list-boxes
 
 Linked list-boxes (16), linked file-boxes (18) and drop-down combo-boxes (22) should be preceded immediately by an edit box that can support the data types in the list.  The lists themselves are drawn from the text field of the definition row which should be a range name or a string that represents a static array.  A linked path box (19) must be preceded immediately by a linked file-box (18).
-Drop down combo-boxes return the value selected in the 7th column of the associated edit box and the position (counting from 1) of the selected item
-in the list in the 7th column of the combo-box item line.
+Drop down combo-boxes return the value selected in the 7th column of the associated edit box and the position (counting from 1) of the selected item in the list in the 7th column of the combo-box item line.
 
 #### Icons
 
