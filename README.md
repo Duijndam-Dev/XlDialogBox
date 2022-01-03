@@ -468,7 +468,7 @@ This  concept has been worked out in the included **DialogBox.xlsb** spreadsheet
 
 ### To get going...
 
-Finally, it is now time to play around with the dialog layout, before hardwiring this in your C# code. Overall it is still a laborious process compared to using graphical design tools - like those in Visual Studio for user forms - but making some changes and testing them is now fairly quick and easy 😊.
+Finally, it is now time to play around with the dialog layout, before hardwiring this in your C# code. Overall it is still a laborious process compared to using graphical design tools - like those in Visual Studio for user forms - but making some changes and testing them is now fairly quick and easy 😊. 
 
 As already mentioned, an example spreadsheet **[DialogBox.xlsb](DialogBox.xlsb)** has been included in the project to assist. 
 
