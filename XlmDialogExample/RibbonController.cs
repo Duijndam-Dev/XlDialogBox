@@ -21,7 +21,8 @@ namespace Ribbon
                 <tabs>
                   <tab id='tab1' label='XlDialogBox'>
                     <group id='group1' label='Dialog Examples'>
-                      <button id='button1' label='Dialog-1' imageMso='DataFormExcel' size='large' onAction='OnButton1Pressed'/>
+                      <button id='button1' label='Generic Example' imageMso='DataFormExcel' size='large' onAction='OnButton1Pressed'/>
+                      <button id='button2' label='File Selector' imageMso='DataFormExcel' size='large' onAction='OnButton2Pressed'/>
                     </group >
                   </tab>
                 </tabs>
@@ -32,6 +33,11 @@ namespace Ribbon
         public void OnButton1Pressed(IRibbonControl control)
         {
             _excel.Application.Run("Dialog1");
+        }
+
+        public void OnButton2Pressed(IRibbonControl control)
+        {
+            _excel.Application.Run("Dialog2");
         }
     }
 }

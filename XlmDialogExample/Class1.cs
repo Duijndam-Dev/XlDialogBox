@@ -33,11 +33,11 @@ namespace XlmDialogExample
             return true; // return to dialog
         }
 
-    [ExcelCommand(
-    Name = "Dialog1",
-    Description = "Starts an example Dialog",
-    HelpTopic = "XlmDialogExample-AddIn.chm!1001",
-    ShortCut = "^R")]
+        [ExcelCommand(
+        Name = "Dialog1",
+        Description = "Starts the example dialog 'Generic.c' from the Excel2013 XLL SDK",
+        HelpTopic = "XlmDialogExample-AddIn.chm!1001",
+        ShortCut = "^R")]
         public static void Dialog1Command()
         {
 
@@ -153,7 +153,55 @@ namespace XlmDialogExample
             var ws = xlApp.Sheets[1] as Worksheet;
             var range = ws.Cells[1, 1] as Range;
             range.Value2 = nameEdit.IO_string;
-        }
+        } // Dialog1Command
+
+
+        [ExcelCommand(
+        Name = "Dialog2",
+        Description = "Starts the File Selector example dialog",
+        HelpTopic = "XlmDialogExample-AddIn.chm!1002",
+        ShortCut = "^R")]
+        public static void Dialog2Command()
+        {
+            var dialog  = new XlDialogBox()                  {	                   W = 420, H = 240, Text = "File finder",  IO = 14, };
+            var ctrl_01 = new XlDialogBox.GroupBox()         {	 X = 013, Y = 010, W = 394, H = 040, Text = "Search directory at launch. Use ♲ button to refresh.",  };
+            var ctrl_02 = new XlDialogBox.ApplyButton()      {	 X = 018, Y = 026, W = 025,          Text = "♲",};
+            var ctrl_03 = new XlDialogBox.DirectoryLabel()   {	 X = 048, Y = 030, W = 357,          };
+            var ctrl_04 = new XlDialogBox.GroupBox()         {	 X = 013, Y = 055, W = 394, H = 140, Text = "File selector. Use *.* to search for all files in a folder",  };
+            var ctrl_05 = new XlDialogBox.TextEdit()         {	 X = 031, Y = 073, W = 170,          IO = "*.*", };
+            var ctrl_06 = new XlDialogBox.LinkedFilesList()  {	 X = 220, Y = 073, W = 170, H = 110, IO = 2, };
+            var ctrl_07 = new XlDialogBox.LinkedDriveList()  {	 X = 031, Y = 096,          H = 090, };
+            var ctrl_08 = new XlDialogBox.OkButton()         {	 X = 190, Y = 205, W = 100,          Text = "&OK",  };
+            var ctrl_09 = new XlDialogBox.HelpButton2()      {	 X = 304, Y = 205, W = 100,          Text = "&Help",  IO = -1, };
+
+            dialog.Controls.Add(ctrl_01);
+            dialog.Controls.Add(ctrl_02);
+            dialog.Controls.Add(ctrl_03);
+            dialog.Controls.Add(ctrl_04);
+            dialog.Controls.Add(ctrl_05);
+            dialog.Controls.Add(ctrl_06);
+            dialog.Controls.Add(ctrl_07);
+            dialog.Controls.Add(ctrl_08);
+            dialog.Controls.Add(ctrl_09);
+
+            dialog.CallingMethod = System.Reflection.MethodBase.GetCurrentMethod(); 
+            dialog.DialogScaling = 125.0;  // Use this if the dialog was designed using a display with 120 DPI
+            bool bOK = dialog.ShowDialog(Validate);
+            if (bOK == false) return;
+
+            // now it is time to play around with the parameters chosen in the dialog box to get things done
+
+            string directory = System.IO.Directory.GetCurrentDirectory();
+            directory = directory.TrimEnd('\\');    // network drives keep trailing backslash
+            string file = ctrl_05.IO_string;
+            string path = directory + "\\" + file;
+
+            var xlApp = (Application)ExcelDnaUtil.Application;
+            var ws = xlApp.Sheets[1] as Worksheet;
+            var range = ws.Cells[1, 1] as Range;
+            range.Value2 = path;
+        } // Dialog1Command
+
     }
 }
 

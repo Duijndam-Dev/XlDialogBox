@@ -2280,7 +2280,7 @@ namespace ExcelDna.XlDialogBox
         ///     Not implemented
         ///     
         ///     Creates a button that works like the OK button but that displays the specified graphic object. 
-        ///     A picture button can be any graphic object created with Excel's drawing tools. (See Chapter 14.)
+        ///     A picture button can be any graphic object created with Excel's drawing tools. (See Chapter 14 Excel 4.0 for Windows)
         ///     Enter the object's idendfier in the text column (an object's identifier is displayed in the formula bar when you select it), as in "Rectangle 1." 
         ///     To display a graphic object in a custom dialog box without making it a button that you can press, enter the item number 223.
         /// </remarks>
