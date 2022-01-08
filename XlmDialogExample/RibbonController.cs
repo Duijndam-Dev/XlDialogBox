@@ -1,5 +1,5 @@
 ﻿using System.Runtime.InteropServices;
-using System.Windows.Forms;
+//using System.Windows.Forms;
 using Excel = Microsoft.Office.Interop.Excel;
 
 using ExcelDna.Integration.CustomUI;
@@ -37,6 +37,8 @@ namespace Ribbon
             </customUI>";
         }
 
+#pragma warning disable IDE0060 // 'control not being used in example code below
+
         public void OnButton0Pressed(IRibbonControl control)
         {
             _excel.Application.Run("Generic_Example");
@@ -71,6 +73,7 @@ namespace Ribbon
         {
             _excel.Application.Run("Show_Help");
         }
+#pragma warning restore IDE0060 // 'control not being used in example code below
 
     }
 }

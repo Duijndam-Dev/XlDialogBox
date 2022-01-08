@@ -369,10 +369,9 @@ bool bOK = dialog.ShowDialog();
 
 ### Building the code
 
-Finally, to successfully build the code, you need to copy the following source files to your solution:
+Finally, to successfully build the code, you need to copy the following source file to your solution:
 
 * `XlDialogBox.cs` - source file containing all dialog classes
-* `XlDialogBoxExtensions.cs` - extension on `obj` used in `XlDialogBox.cs`
 
 And you need to have the following NuGet packages installed :
 
@@ -470,7 +469,7 @@ This  concept has been worked out in the included **DialogBox.xlsb** spreadsheet
 
 By using `Ctrl+Shift+D` to test a particular dialog, you can play around with it's layout, before hardwiring this in your C# code. Overall it is still a laborious process compared to using graphical design tools - like those in Visual Studio for user forms - but making layout changes and testing them is now a fairly quick and easy process 😊. 
 
-As already mentioned, an example spreadsheet **[DialogBox.xlsb](DialogBox.xlsb)** has been included in the project to assist making new dialogs. Also, all examples provided in this spreadsheet are now accessible from the **XlDialogBox ribbon** when you build the project.
+As already mentioned, an example spreadsheet **[DialogBox.xlsb](DialogBox.xlsb)** has been included in the project to assist building new dialogs. Also, all examples provided in this spreadsheet are now accessible from the **XlDialogBox ribbon** when you build the project.
 
 This [link](https://exceloffthegrid.com/using-excel-4-macro-functions/) provides more information on the use of Excel 4.0 macro's. And here's some information on [programming with the C API](https://github.com/MicrosoftDocs/office-developer-client-docs/blob/master/docs/excel/programming-with-the-c-api-in-excel.md) in Excel, also covering the relation to XLM, the 'old' [XLM macro language](https://github.com/MicrosoftDocs/office-developer-client-docs/blob/master/docs/excel/programming-with-the-c-api-in-excel.md#c-api-and-its-relation-to-xlm).
 

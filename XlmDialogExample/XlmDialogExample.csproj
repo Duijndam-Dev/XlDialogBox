@@ -33,19 +33,19 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="ExcelDna.Documentation, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\ExcelDnaDoc.1.1.0-beta2\lib\net40\ExcelDna.Documentation.dll</HintPath>
+    <Reference Include="ExcelDna.Documentation, Version=1.5.1.0, Culture=neutral, PublicKeyToken=f225e9659857edbe, processorArchitecture=MSIL">
+      <HintPath>..\packages\ExcelDnaDoc.1.5.1\lib\net452\ExcelDna.Documentation.dll</HintPath>
     </Reference>
     <Reference Include="ExcelDna.Integration, Version=1.1.0.0, Culture=neutral, PublicKeyToken=f225e9659857edbe, processorArchitecture=MSIL">
-      <HintPath>..\packages\ExcelDna.Integration.1.2.5-preview\lib\net452\ExcelDna.Integration.dll</HintPath>
+      <HintPath>..\packages\ExcelDna.Integration.1.5.1\lib\net452\ExcelDna.Integration.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Office.Interop.Excel, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
     <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -55,11 +55,10 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Class1.cs" />
+    <Compile Include="Examples.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RibbonController.cs" />
     <Compile Include="XlDialogBox\XlDialogBox.cs" />
-    <Compile Include="XlDialogBox\XlDialogBoxExtension.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="HelpContent\CategoryTemplate.cshtml">
@@ -83,10 +82,10 @@
     <None Include="HelpContent\TableOfContentsTemplate.cshtml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="packages.config" />
     <None Include="Properties\ExcelDna.Build.props" />
     <None Include="README.md" />
     <None Include="XlmDialogExample-AddIn.dna" />
-    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="HelpContent\bin\ExcelDna.Documentation.dll" />
@@ -98,13 +97,13 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>"D:\Source\VS19\XlmDialogExample\packages\ExcelDnaDoc.1.1.0-beta2\tools\ExcelDnaDoc.exe" "$(TargetDir)XlmDialogExample-AddIn.dna" /Y</PostBuildEvent>
+    <PostBuildEvent>"D:\Source\VS19\XlmDialogExample\packages\ExcelDnaDoc.1.5.1\tools\ExcelDnaDoc.exe" "$(TargetDir)XlmDialogExample-AddIn.dna" /Y</PostBuildEvent>
   </PropertyGroup>
-  <Import Project="..\packages\ExcelDna.AddIn.1.2.5-preview\build\ExcelDna.AddIn.targets" Condition="Exists('..\packages\ExcelDna.AddIn.1.2.5-preview\build\ExcelDna.AddIn.targets')" />
+  <Import Project="..\packages\ExcelDna.AddIn.1.5.1\build\ExcelDna.AddIn.targets" Condition="Exists('..\packages\ExcelDna.AddIn.1.5.1\build\ExcelDna.AddIn.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\ExcelDna.AddIn.1.2.5-preview\build\ExcelDna.AddIn.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\ExcelDna.AddIn.1.2.5-preview\build\ExcelDna.AddIn.targets'))" />
+    <Error Condition="!Exists('..\packages\ExcelDna.AddIn.1.5.1\build\ExcelDna.AddIn.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\ExcelDna.AddIn.1.5.1\build\ExcelDna.AddIn.targets'))" />
   </Target>
 </Project>

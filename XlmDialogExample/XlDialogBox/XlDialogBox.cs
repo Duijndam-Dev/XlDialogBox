@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
-using System.Windows.Forms;
+using System.Windows;
+//using System.Windows.Forms;
 using System.Windows.Interop;
 using ExcelDna.Integration;
 
@@ -533,8 +534,25 @@ namespace ExcelDna.XlDialogBox
     /// when 'true' is returned, the ShowDialog function updates the Controls with info from dialogResult
     /// </returns>
     public delegate bool DDV(int index, object[,] dialogResult, XlDialogBox.XlDialogControlCollection Controls);
-    
+
     #endregion Data validation
+
+    #region Extensions
+    // do more than checking for a null-pointer to see if an object under XlDialogBox is valid
+    internal static class Extensions
+    {
+        public static bool IsNull(this object instance)
+        {
+            return 
+                instance == null || 
+                instance == System.Type.Missing ||
+                instance is DBNull ||
+                instance is ExcelEmpty ||
+                instance is ExcelError ||
+                instance is ExcelMissing;
+        }
+    }
+    #endregion Extensions
 
     /// <summary>
     ///     DIALOG.BOX(dialog_ref)
@@ -2537,6 +2555,9 @@ namespace ExcelDna.XlDialogBox
                 throw new ArgumentNullException("Failed to get DC.");
         }
 */
+
+#pragma warning disable IDE0051 // These two routines can be useful in dealing with DPI settings
+
         /// <summary>
         /// Transforms device independent units (1/96 of an inch) to pixels
         /// from : https://dzimchuk.net/best-way-to-get-dpi-value-in-wpf/
@@ -2578,5 +2599,7 @@ namespace ExcelDna.XlDialogBox
             pixelY = (int)(matrix.M22 * unitY);
 
         }
+#pragma warning restore IDE0051 // These two routines can be useful in dealing with DPI settings
+
     }
 }

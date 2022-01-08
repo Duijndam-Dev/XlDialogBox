@@ -10,7 +10,7 @@ using ExcelDna.Integration;
 using ExcelDna.XlDialogBox;
 namespace XlmDialogExample
 {
-    public class Class1
+    public class Examples
     {
 
         /// <summary>
@@ -28,7 +28,7 @@ namespace XlmDialogExample
         static bool Validate(int index, object[,] dialogResult, XlDialogBox.XlDialogControlCollection Controls)
         {
             // just some code to set a break point
-            int i = index;
+            // int i = index;
 
             return true; // return to dialog
         }
@@ -155,6 +155,8 @@ namespace XlmDialogExample
             range.Value2 = nameEdit.IO_string;
         } // Cmd_Generic
 
+#pragma warning disable CS0649 // Dialogs are only initialized, the results aren't being used in these examples
+#pragma warning disable IDE0044 // Dialogs are only initialized, the results aren't being used in these examples
         static string DI_Range;
         static string Vp_Range;
         static string Un_Range;
@@ -163,6 +165,8 @@ namespace XlmDialogExample
         static double VertSamp = 25;
         static bool   Rays_upw = true;
         static bool   MakePlot = true;
+#pragma warning restore CS0649 // Dialogs are only initialized, the results aren't being used in these examples
+#pragma warning restore IDE0044 // Dialogs are only initialized, the results aren't being used in these examples
 
         [ExcelCommand(
             Name = "Ray_Tracer",
@@ -172,7 +176,7 @@ namespace XlmDialogExample
         public static void Cmd_RayTracer()
         {
             var dialog = new XlDialogBox() { W = 515, H = 330, Text = "Ray Tracer Wizard", IO = 3, };
-            var ctrl_01 = new XlDialogBox.GroupBox() { X = 015, Y = 010, W = 480, H = 160, Text = "Over&burden parameters  -->   Vp && depth ranges need same nr of rows", };
+            var ctrl_01 = new XlDialogBox.GroupBox() { X = 015, Y = 010, W = 480, H = 160, Text = "Over&burden parameters  ➔   Vp && depth ranges need same nr of rows", };
             var ctrl_02 = new XlDialogBox.Label() { X = 030, Y = 031, Text = "&Depth Information in 1 column", };
             var ctrl_03 = new XlDialogBox.RefEdit() { X = 030, Y = 046, W = 200, };
             var ctrl_04 = new XlDialogBox.Label() { X = 240, Y = 042, W = 235, H = 040, Text = "Exclude Z = 0 value. Use same nr. of data points as used for Vp (see below).", };
@@ -237,14 +241,17 @@ namespace XlmDialogExample
         } // Cmd_RayTracer
 
         // used in the depth chart dialog
+#pragma warning disable CS0649 // Dialogs are only initialized, the results aren't being used in these examples
+#pragma warning disable IDE0044 // Dialogs are only initialized, the results aren't being used in these examples
         static string ChartTitle = "Common-depth chart";
         static string TitleRange;
         static string DepthRange;
         static string Data_Range;
-        static int    ChartCount = 1;
         static int    RangesVert = 0;
         static int    Chart_type = 2;
         static bool   PlotColors = true;
+#pragma warning restore CS0649 // Dialogs are only initialized, the results aren't being used in these examples
+#pragma warning restore IDE0044 // Dialogs are only initialized, the results aren't being used in these examples
 
         [ExcelCommand(
             Name = "Chart_Dialog",
